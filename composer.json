@@ -1,0 +1,53 @@
+{
+    "name": "bildvitta/iss-sdk",
+    "description": "This package is used to communicate with the permission and authentication microservice.",
+    "type": "library",
+    "keywords": [
+        "bildvitta",
+        "laravel",
+        "hub",
+        "iss-sdk"
+    ],
+    "homepage": "https://github.com/bildvitta/iss-sdk",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jean C. Garcia",
+            "email": "jean.garcia@bild.com.br",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "illuminate/contracts": "^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "10.0.x-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "BildVitta\\Hub\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BildVitta\\Hub\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BildVitta\\Hub\\HubServiceProvider"
+            ],
+            "aliases": {
+                "hub": "BildVitta\\Hub\\Facades\\Hub",
+                "iss-sdk": "BildVitta\\Hub\\Facades\\Hub"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
