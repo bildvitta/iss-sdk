@@ -3,7 +3,9 @@
 namespace BildVitta\Hub;
 
 use BildVitta\Hub\Console\InstallHub;
+use BildVitta\Hub\Middleware\AuthenticateHubMiddleware;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Routing\Router;
 
 /**
  * Class HubServiceProvider.
@@ -39,5 +41,8 @@ class HubServiceProvider extends ServiceProvider
         }
 
         $this->commands([InstallHub::class]);
+
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('capitalize', AuthenticateHubMiddleware::class);
     }
 }
