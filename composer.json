@@ -25,16 +25,13 @@
         "phpunit/phpunit": "10.0.x-dev"
     },
     "autoload": {
-        "files": [
-            "src/helpers.php"
-        ],
         "psr-4": {
-            "BildVitta\\Hub\\": "src"
+            "BildVitta\\Hub\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "BildVitta\\Hub\\Tests\\": "tests"
+            "BildVitta\\Hub\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -46,11 +43,10 @@
                 "BildVitta\\Hub\\HubServiceProvider"
             ],
             "aliases": {
-                "hub": "BildVitta\\Hub\\Facades\\Hub",
-                "iss-sdk": "BildVitta\\Hub\\Facades\\Hub"
+                "hub": "BildVitta\\Hub\\Facades\\Hub"
             }
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "minimum-stability": "dev"
 }
