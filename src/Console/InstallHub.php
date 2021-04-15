@@ -56,6 +56,8 @@ class InstallHub extends Command
             $this->info('Existing configuration was not overwritten');
         }
 
+        $this->runMigrations();
+
         $this->info('Installed HubPackage');
     }
 
@@ -93,5 +95,12 @@ class InstallHub extends Command
     private function shouldOverwriteConfig(): bool
     {
         return $this->confirm('Config file already exists. Do you want to overwrite it?', false);
+    }
+
+    private function runMigrations()
+    {
+        $this->info('Run migrations.');
+        $this->call('migrate', ['--path' => 'vendor\bildvitta\iss-sdk\database\migrations']);
+        $this->info('Finish migrations.');
     }
 }

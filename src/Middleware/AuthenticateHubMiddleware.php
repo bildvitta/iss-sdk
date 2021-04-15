@@ -3,10 +3,12 @@
 namespace BildVitta\Hub\Middleware;
 
 use BildVitta\Hub\Exceptions\AuthenticationException;
-use BildVitta\Hub\Hub;
 use Closure;
-use Illuminate\Http\Client\RequestException;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use stdClass;
+use Throwable;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -15,7 +17,45 @@ use Illuminate\Http\Request;
  */
 class AuthenticateHubMiddleware
 {
+    /**
+     * Token JWT.
+     *
+     * @var string|null
+     */
+    private ?string $token;
+
+    /**
+     * @param  Request  $request
+     * @param  Closure  $next
+     *
+     * @return mixed
+     *
+     * @throws AuthenticationException
+     */
     public function handle(Request $request, Closure $next)
+    {
+        $this->setToken($request);
+
+        try {
+            $apiUser = $this->getUser();
+
+            $user = $this->updateOrCreateUser($apiUser);
+
+            auth()->login($user);
+
+            return $next($request);
+        } catch (Throwable $e) {
+            throw new AuthenticationException(__('Não foi possível realizar a autenticação.'),0, $e);
+        }
+    }
+
+    /**
+     * @param  Request  $request
+     * @return void
+     *
+     * @throws AuthenticationException
+     */
+    private function setToken(Request $request): void
     {
         $token = $request->bearerToken();
 
@@ -23,22 +63,42 @@ class AuthenticateHubMiddleware
             throw new AuthenticationException(__('Bearer token é obrigatório.'));
         }
 
+        $this->token = $token;
+    }
+
+    /**
+     * @return stdClass
+     */
+    private function getUser(): stdClass
+    {
+        $response = app('hub', [$this->token])->users()->me();
+
+        return $response->object()->result;
+    }
+
+    /**
+     * @param  stdClass  $apiUser
+     *
+     * @return Authenticatable
+     */
+    private function updateOrCreateUser(stdClass $apiUser): Authenticatable
+    {
+        $userModel = app(config('hub.model_user'));
+
         try {
-//            $response = app('hub', [$token])->users()->me();
-//            $body = $response->object();
+            $user = $userModel->whereHubUuid($apiUser->uuid)->firstOrFail();
 
-            $body = json_decode('{"status":{"code":200},"result":{"name":"B\u00e1rbara Flores Sobrinho","email":"ad-consequuntur-ullam@example.org","password":"$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC\/.og\/at2.uheWG\/igi","password2":null,"uuid":"4123c474-50e4-44a7-8a00-09782516c35b","type":"cnpj","document":"83312195720480","company_name":"Alessandro Carmona Jr.","creci":"4212330","regional_creci":"GO","kind":"employee","zip_code":"85164-085","street_name":"R. Yuri","street_number":"66816","city":"Maia do Leste","state":"Amazonas","complement":"Bloco A","neighborhood":"Santa","phone":"(84) 3169-6815","is_active":1,"is_approved":true,"groups":["1ff02548-6520-4ffa-a404-5c363e45bda4"],"roles":[]}}');
-
-            dd($body);
-
-        } catch (RequestException $e) {
+            $user->hub_uuid = $apiUser->uuid;
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            $user = new $userModel();
+            $user->hub_uuid = $apiUser->uuid;
+            $user->name = $apiUser->name;
+            $user->email = $apiUser->name;
+            $user->password = bcrypt(uniqid(rand()));
         }
 
+        $user->saveOrFail();
 
-        #TODO: criar user se nao existir e persistir no banco um de-para
-
-//        auth()->loginUsingId($user->id);
-
-        return $next($request);
+        return $user;
     }
 }

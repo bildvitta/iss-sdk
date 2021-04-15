@@ -40,6 +40,8 @@ class HubServiceProvider extends ServiceProvider
             );
         }
 
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
         $this->commands([InstallHub::class]);
 
         $router = $this->app->make(Router::class);
