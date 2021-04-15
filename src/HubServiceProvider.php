@@ -45,6 +45,6 @@ class HubServiceProvider extends ServiceProvider
         $this->commands([InstallHub::class]);
 
         $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('hub:auth', AuthenticateHubMiddleware::class);
+        $router->aliasMiddleware('hub.auth', AuthenticateHubMiddleware::class);
     }
 }
