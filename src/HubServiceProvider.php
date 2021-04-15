@@ -4,8 +4,9 @@ namespace BildVitta\Hub;
 
 use BildVitta\Hub\Console\InstallHub;
 use BildVitta\Hub\Middleware\AuthenticateHubMiddleware;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Routing\Router;
+use Illuminate\Support\ServiceProvider;
 
 /**
  * Class HubServiceProvider.
@@ -30,14 +31,13 @@ class HubServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @return void
+     *
+     * @throws BindingResolutionException
      */
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes(
-                [__DIR__ . '/../config/hub.php' => config_path('hub.php')],
-                'hub-config'
-            );
+            $this->publishes([__DIR__ . '/../config/hub.php' => config_path('hub.php')], 'hub-config');
         }
 
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
