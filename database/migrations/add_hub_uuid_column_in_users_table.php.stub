@@ -5,9 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Class AddHubUuidColumnInUsersTables.
+ * Class addHubUuidColumnInUsersTable.
  */
-class AddHubUuidColumnInUsersTables extends Migration
+class addHubUuidColumnInUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,7 +16,7 @@ class AddHubUuidColumnInUsersTables extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             $table->uuid('hub_uuid')->after('id');
         });
     }

@@ -93,7 +93,7 @@ class AuthenticateHubMiddleware
             $user = new $userModel();
             $user->hub_uuid = $apiUser->uuid;
             $user->name = $apiUser->name;
-            $user->email = $apiUser->name;
+            $user->email = $apiUser->email;
             $user->password = bcrypt(uniqid(rand()));
         }
 

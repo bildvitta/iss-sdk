@@ -37,10 +37,17 @@ class HubServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__ . '/../config/hub.php' => config_path('hub.php')], 'hub-config');
-        }
+            $this->publishes(
+                [__DIR__ . '/../config/hub.php' => config_path('hub.php')],
+                'hub-config'
+            );
 
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+            if (! class_exists('addHubUuidColumnInUsersTable')) {
+                $this->publishes([
+                    __DIR__ . '/../database/migrations/add_hub_uuid_column_in_users_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_hub_uuid_column_in_users_table.php'),
+                ], 'hub-migration');
+            }
+        }
 
         $this->commands([InstallHub::class]);
 
