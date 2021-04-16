@@ -14,10 +14,15 @@ class addHubUuidColumnInUsersTable extends Migration
      *
      * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->uuid('hub_uuid')->after('id');
+            $table->uuid('hub_uuid')->nullable()->after('id');
+        });
+
+        Schema::create('hub_users', function (Blueprint $table) {
+            $table->bigInteger('user_id');
+            $table->char('token', 32);
         });
     }
 
@@ -26,8 +31,10 @@ class addHubUuidColumnInUsersTable extends Migration
      *
      * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropColumns('users', 'hub_uuid');
+        Schema::dropIfExists('user_id');
+        Schema::dropColumns('users', ['hub_uuid']);
     }
+}
 }

@@ -15,7 +15,7 @@ interface AuthResourceContract
     /**
      * Checks if the token passed by parameter or previously loaded in the ISS Service is valid.
      *
-     * @param  string $token
+     * @param  string  $token
      *
      * @return bool
      *

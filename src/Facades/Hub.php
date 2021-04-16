@@ -1,12 +1,15 @@
 <?php
 
+/** @noinspection PhpUndefinedClassInspection */
+
 namespace BildVitta\Hub\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use RuntimeException;
 
 /**
- * Class HubApi
+ * Class HubApi.
+ *
  * @package BildVitta\Hub\Facades
  */
 class Hub extends Facade

@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpUndefinedClassInspection */
+
 namespace BildVitta\Hub;
 
 use BildVitta\Hub\Console\InstallHub;
@@ -44,8 +46,10 @@ class HubServiceProvider extends ServiceProvider
 
             if (! class_exists('addHubUuidColumnInUsersTable')) {
                 $this->publishes([
-                    __DIR__ . '/../database/migrations/add_hub_uuid_column_in_users_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_hub_uuid_column_in_users_table.php'),
-                ], 'hub-migration');
+                    __DIR__ . '/../database/migrations/add_hub_uuid_column_in_users_table.php.stub' => database_path(
+                        'migrations/' . date('Y_m_d_His',time()) . '_add_hub_uuid_column_in_users_table.php'
+                    )], 'hub-migration'
+                );
             }
         }
 

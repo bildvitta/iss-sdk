@@ -1,14 +1,19 @@
 <?php
+/** @noinspection PhpUndefinedClassInspection */
 
 namespace BildVitta\Hub\Middleware;
 
+use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Exceptions\AuthenticationException;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use stdClass;
-use Throwable;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -22,7 +27,50 @@ class AuthenticateHubMiddleware
      *
      * @var string|null
      */
-    private ?string $token;
+    private ?string $bearerToken;
+
+    /**
+     * @var Auth
+     */
+    private $authService;
+
+    /**
+     * @var Config
+     */
+    private $configService;
+
+    /**
+     * @var Cache
+     */
+    private $cacheService;
+
+    /**
+     * @var HubUser
+     */
+    private HubUser $hubUserModel;
+
+    /**
+     * Hashing token with md5, that will be saved in the table 'hub_users'.
+     *
+     * @var string
+     */
+    private string $bearerTokenHash;
+
+    /**
+     * @var string
+     */
+    private string $cacheKey;
+
+    /**
+     * Test constructor.
+     */
+    public function __construct()
+    {
+        $this->authService = app('auth');
+        $this->configService = app('config');
+        $this->cacheService = app('cache');
+        $this->hubUserModel = new HubUser();
+    }
 
     /**
      * @param  Request  $request
@@ -36,21 +84,33 @@ class AuthenticateHubMiddleware
     {
         $this->setToken($request);
 
+        $this->bearerTokenHash = md5($this->bearerToken);
+        $this->cacheKey = 'access_token_user_id_' . $this->bearerTokenHash;
+
         try {
+            $this->loginByCache();
+        } catch (ModelNotFoundException $modelNotFoundException) {
             $apiUser = $this->getUser();
 
             $user = $this->updateOrCreateUser($apiUser);
 
-            auth()->login($user);
+            $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
 
-            return $next($request);
-        } catch (Throwable $e) {
-            throw new AuthenticationException(__('Não foi possível realizar a autenticação.'),0, $e);
+            $this->cacheService->put($this->cacheKey, $user->id);
+
+            $this->loginByUserId($user->id);
         }
+
+        if ($this->authService->guest()) {
+            throw new AuthenticationException(__('Não foi possível autenticar o access_token.'));
+        }
+
+        return $next($request);
     }
 
     /**
      * @param  Request  $request
+     *
      * @return void
      *
      * @throws AuthenticationException
@@ -63,7 +123,31 @@ class AuthenticateHubMiddleware
             throw new AuthenticationException(__('Bearer token é obrigatório.'));
         }
 
-        $this->token = $token;
+        $this->bearerToken = $token;
+    }
+
+    /**
+     * @return Authenticatable
+     */
+    private function loginByCache(): Authenticatable
+    {
+        $userId = $this->cacheService->rememberForever($this->cacheKey,
+            function () {
+                return $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id;
+            }
+        );
+
+        return $this->loginByUserId($userId);
+    }
+
+    /**
+     * @param  int  $userId
+     *
+     * @return Authenticatable
+     */
+    private function loginByUserId(int $userId): Authenticatable
+    {
+        return app('auth')->loginUsingId($userId);
     }
 
     /**
@@ -71,7 +155,7 @@ class AuthenticateHubMiddleware
      */
     private function getUser(): stdClass
     {
-        $response = app('hub', [$this->token])->users()->me();
+        $response = app('hub', [$this->bearerToken])->users()->me();
 
         return $response->object()->result;
     }
@@ -86,7 +170,14 @@ class AuthenticateHubMiddleware
         $userModel = app(config('hub.model_user'));
 
         try {
-            $user = $userModel->whereHubUuid($apiUser->uuid)->firstOrFail();
+            $user = $userModel
+                ->whereEmail($apiUser->email)
+                ->where(function (Builder $builder) use ($apiUser) {
+                    $builder
+                        ->where('hub_uuid', $apiUser->uuid)
+                        ->orWhereNull('hub_uuid');
+                }
+                )->firstOrFail();
 
             $user->hub_uuid = $apiUser->uuid;
         } catch (ModelNotFoundException $modelNotFoundException) {

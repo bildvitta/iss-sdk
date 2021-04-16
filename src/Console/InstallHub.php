@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpMissingFieldTypeInspection */
 
 namespace BildVitta\Hub\Console;
 
