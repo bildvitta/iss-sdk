@@ -37,4 +37,3 @@ class addHubUuidColumnInUsersTable extends Migration
         Schema::dropColumns('users', ['hub_uuid']);
     }
 }
-}
