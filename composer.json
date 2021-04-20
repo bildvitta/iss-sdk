@@ -19,19 +19,20 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
-        "illuminate/contracts": "^8.0"
+        "illuminate/contracts": "^8.0",
+        "illuminate/support": "^8.0"
     },
     "require-dev": {
         "phpunit/phpunit": "10.0.x-dev"
     },
     "autoload": {
         "psr-4": {
-            "BildVitta\\Hub\\": "src"
+            "BildVitta\\Hub\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "BildVitta\\Hub\\Tests\\": "tests"
+            "BildVitta\\Hub\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -43,11 +44,10 @@
                 "BildVitta\\Hub\\HubServiceProvider"
             ],
             "aliases": {
-                "hub": "BildVitta\\Hub\\Facades\\Hub",
-                "iss-sdk": "BildVitta\\Hub\\Facades\\Hub"
+                "hub": "BildVitta\\Hub\\Facades\\Hub"
             }
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "minimum-stability": "dev"
 }

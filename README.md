@@ -7,7 +7,7 @@ The ISS (International Space Station) aims to be a space station (`client`) of c
 You can install the package via composer:
 
 ```bash
-composer require bildvitta/iss-sdk
+composer require bildvitta/iss-sdk:dev-develop
 ```
 
 For everything to work perfectly in addition to having the settings file published in your application, run the command
@@ -79,6 +79,20 @@ $hub = (new \BildVitta\Hub\Hub())->setToken($token); // instance 4
 $hub = BildVitta\Hub\Facades\Hub::setToken($token); // instance 1
 
 ```
+
+## Authenticating User
+
+To authenticate the Hub user in your module, it is necessary to use the middleware `hub.auth = \ BildVitta \ Hub \ Middleware \ AuthenticateHubMiddleware`.
+
+It will validate the token and create, if it does not exist, the user of the token in its user table.
+
+````php
+Route::middleware('hub.auth')->get('/users/me', function () {
+    return auth()->user()->toArray();
+});
+````
+
+When we installed the package, we created the `hub_uuid` column in your user table.
 
 ## User Authenticated
 
