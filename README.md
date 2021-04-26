@@ -94,6 +94,21 @@ Route::middleware('hub.auth')->get('/users/me', function () {
 
 When we installed the package, we created the `hub_uuid` column in your user table.
 
+Tf it is not possible to authenticate, the middleware will return `\BildVitta\Hub\Exceptions\AuthenticationException` which will raise error 500 in your application.
+
+To avoid error 500 in your `\App\Exceptions\Handler::render` mandatory the code:
+
+```php
+    if ($e instanceof \BildVitta\Hub\Exceptions\AuthenticationException) {
+        $statusCode = Response::HTTP_UNAUTHORIZED;
+        $statusText = Response::$statusTexts[$statusCode];
+
+        return response()->json(['status' => ['code' => $statusCode, 'text' => $statusText]], $statusCode);
+    }
+```
+
+With this code the application will return 401.
+
 ## User Authenticated
 
 To access the token's user data directly, there is the ``\BildVitta\Hub\Contracts\Resources\AuthResourceContract``
