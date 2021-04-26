@@ -9,11 +9,13 @@ use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use stdClass;
+use Throwable;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -90,19 +92,23 @@ class AuthenticateHubMiddleware
         try {
             $this->loginByCache();
         } catch (ModelNotFoundException $modelNotFoundException) {
-            $apiUser = $this->getUser();
+            try {
+                $apiUser = $this->getUser();
 
-            $user = $this->updateOrCreateUser($apiUser);
+                $user = $this->updateOrCreateUser($apiUser);
 
-            $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
+                $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
 
-            $this->cacheService->put($this->cacheKey, $user->id);
+                $this->cacheService->put($this->cacheKey, $user->id);
 
-            $this->loginByUserId($user->id);
+                $this->loginByUserId($user->id);
+            } catch (RequestException $requestException) {
+                $this->throw(__('Não foi possível autenticar o access_token.'), $requestException);
+            }
         }
 
         if ($this->authService->guest()) {
-            throw new AuthenticationException(__('Não foi possível autenticar o access_token.'));
+            $this->throw(__('Não foi possível autenticar o access_token.'));
         }
 
         return $next($request);
@@ -120,10 +126,23 @@ class AuthenticateHubMiddleware
         $token = $request->bearerToken();
 
         if (is_null($token)) {
-            throw new AuthenticationException(__('Bearer token é obrigatório.'));
+            $this->throw(__('Bearer token é obrigatório.'));
         }
 
         $this->bearerToken = $token;
+    }
+
+    /**
+     * @param  string  $message
+     * @param  Throwable|null  $previous
+     *
+     * @return void
+     *
+     * @throws AuthenticationException
+     */
+    private function throw(string $message, ?Throwable $previous = null): void
+    {
+        throw new AuthenticationException($message, 0, $previous);
     }
 
     /**
