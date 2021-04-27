@@ -137,6 +137,9 @@ class AuthenticateHubMiddleware
             }
         );
 
+        $userModel = app(config('hub.model_user'));
+        $userModel->findOrFail($userId, ['id']);
+
         return $this->loginByUserId($userId);
     }
 
