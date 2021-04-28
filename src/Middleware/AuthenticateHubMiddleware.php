@@ -10,13 +10,10 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
-use stdClass;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -105,21 +102,21 @@ class AuthenticateHubMiddleware
 
                     $this->loginByUserId($user->id);
                 } catch (RequestException $requestException) {
-                    $this->thow(__('Não foi possível autenticar o access_token.'), $requestException);
+                    $this->throw(__('Não foi possível autenticar o access_token.'), $requestException);
                 }
             }
 
             if ($this->authService->guest()) {
-                $this->thow(__('Não foi possível autenticar o access_token.'));
+                $this->throw(__('Não foi possível autenticar o access_token.'));
             }
         } catch (Throwable $exception) {
             return response()->json([
-                                        'status' => [
-                                            'code' => Response::HTTP_UNAUTHORIZED,
-                                            'text' => $exception->getMessage()
-                                        ]
-                                    ],
-                                    Response::HTTP_UNAUTHORIZED
+                'status' => [
+                    'code' => Response::HTTP_UNAUTHORIZED,
+                    'text' => $exception->getMessage()
+                ]
+            ],
+                Response::HTTP_UNAUTHORIZED
             );
         }
 
@@ -138,7 +135,7 @@ class AuthenticateHubMiddleware
         $token = $request->bearerToken();
 
         if (is_null($token)) {
-            $this->thow(__('Bearer token é obrigatório.'));
+            $this->throw(__('Bearer token é obrigatório.'));
         }
 
         $this->bearerToken = $token;
@@ -146,13 +143,14 @@ class AuthenticateHubMiddleware
 
     /**
      * @param  string  $message
+     * @param  Throwable|null  $previous
      * @param  Throwable  $previous
      *
      * @return void
      *
      * @throws AuthenticationException
      */
-    private function thow(string $message, ?Throwable $previous = null): void
+    private function throw(string $message, ?Throwable $previous = null): void
     {
         throw new AuthenticationException($message, 0, $previous);
     }
@@ -210,7 +208,8 @@ class AuthenticateHubMiddleware
                     $builder
                         ->where('hub_uuid', $apiUser->uuid)
                         ->orWhereNull('hub_uuid');
-                })->firstOrFail();
+                }
+                )->firstOrFail();
 
             $user->hub_uuid = $apiUser->uuid;
         } catch (ModelNotFoundException $modelNotFoundException) {
