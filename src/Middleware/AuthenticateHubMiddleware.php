@@ -6,16 +6,14 @@ namespace BildVitta\Hub\Middleware;
 use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Exceptions\AuthenticationException;
 use Closure;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
-use stdClass;
-use Throwable;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -32,19 +30,19 @@ class AuthenticateHubMiddleware
     private ?string $bearerToken;
 
     /**
-     * @var Auth
+     * @var AuthManager
      */
-    private $authService;
+    private AuthManager $authService;
 
     /**
-     * @var Config
+     * @var Repository
      */
-    private $configService;
+    private Repository $configService;
 
     /**
-     * @var Cache
+     * @var CacheManager
      */
-    private $cacheService;
+    private CacheManager $cacheService;
 
     /**
      * @var HubUser
@@ -84,31 +82,42 @@ class AuthenticateHubMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $this->setToken($request);
-
-        $this->bearerTokenHash = md5($this->bearerToken);
-        $this->cacheKey = 'access_token_user_id_' . $this->bearerTokenHash;
-
         try {
-            $this->loginByCache();
-        } catch (ModelNotFoundException $modelNotFoundException) {
+            $this->setToken($request);
+
+            $this->bearerTokenHash = md5($this->bearerToken);
+            $this->cacheKey = 'access_token_user_id_' . $this->bearerTokenHash;
+
             try {
-                $apiUser = $this->getUser();
+                $this->loginByCache();
+            } catch (ModelNotFoundException $modelNotFoundException) {
+                try {
+                    $apiUser = $this->getUser();
 
-                $user = $this->updateOrCreateUser($apiUser);
+                    $user = $this->updateOrCreateUser($apiUser);
 
-                $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
+                    $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
 
-                $this->cacheService->put($this->cacheKey, $user->id);
+                    $this->cacheService->put($this->cacheKey, $user->id);
 
-                $this->loginByUserId($user->id);
-            } catch (RequestException $requestException) {
-                $this->throw(__('Não foi possível autenticar o access_token.'), $requestException);
+                    $this->loginByUserId($user->id);
+                } catch (RequestException $requestException) {
+                    $this->throw(__('Não foi possível autenticar o access_token.'), $requestException);
+                }
             }
-        }
 
-        if ($this->authService->guest()) {
-            $this->throw(__('Não foi possível autenticar o access_token.'));
+            if ($this->authService->guest()) {
+                $this->throw(__('Não foi possível autenticar o access_token.'));
+            }
+        } catch (Throwable $exception) {
+            return response()->json([
+                'status' => [
+                    'code' => Response::HTTP_UNAUTHORIZED,
+                    'text' => $exception->getMessage()
+                ]
+            ],
+                Response::HTTP_UNAUTHORIZED
+            );
         }
 
         return $next($request);
@@ -135,6 +144,7 @@ class AuthenticateHubMiddleware
     /**
      * @param  string  $message
      * @param  Throwable|null  $previous
+     * @param  Throwable  $previous
      *
      * @return void
      *
@@ -155,6 +165,9 @@ class AuthenticateHubMiddleware
                 return $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id;
             }
         );
+
+        $userModel = app(config('hub.model_user'));
+        $userModel->findOrFail($userId, ['id']);
 
         return $this->loginByUserId($userId);
     }
