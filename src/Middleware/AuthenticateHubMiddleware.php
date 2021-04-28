@@ -6,14 +6,17 @@ namespace BildVitta\Hub\Middleware;
 use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Exceptions\AuthenticationException;
 use Closure;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use stdClass;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -30,19 +33,19 @@ class AuthenticateHubMiddleware
     private ?string $bearerToken;
 
     /**
-     * @var Auth
+     * @var AuthManager
      */
-    private $authService;
+    private AuthManager $authService;
 
     /**
-     * @var Config
+     * @var Repository
      */
-    private $configService;
+    private Repository $configService;
 
     /**
-     * @var Cache
+     * @var CacheManager
      */
-    private $cacheService;
+    private CacheManager $cacheService;
 
     /**
      * @var HubUser
@@ -82,27 +85,42 @@ class AuthenticateHubMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $this->setToken($request);
-
-        $this->bearerTokenHash = md5($this->bearerToken);
-        $this->cacheKey = 'access_token_user_id_' . $this->bearerTokenHash;
-
         try {
-            $this->loginByCache();
-        } catch (ModelNotFoundException $modelNotFoundException) {
-            $apiUser = $this->getUser();
+            $this->setToken($request);
 
-            $user = $this->updateOrCreateUser($apiUser);
+            $this->bearerTokenHash = md5($this->bearerToken);
+            $this->cacheKey = 'access_token_user_id_' . $this->bearerTokenHash;
 
-            $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
+            try {
+                $this->loginByCache();
+            } catch (ModelNotFoundException $modelNotFoundException) {
+                try {
+                    $apiUser = $this->getUser();
 
-            $this->cacheService->put($this->cacheKey, $user->id);
+                    $user = $this->updateOrCreateUser($apiUser);
 
-            $this->loginByUserId($user->id);
-        }
+                    $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
 
-        if ($this->authService->guest()) {
-            throw new AuthenticationException(__('Não foi possível autenticar o access_token.'));
+                    $this->cacheService->put($this->cacheKey, $user->id);
+
+                    $this->loginByUserId($user->id);
+                } catch (RequestException $requestException) {
+                    $this->thow(__('Não foi possível autenticar o access_token.'), $requestException);
+                }
+            }
+
+            if ($this->authService->guest()) {
+                $this->thow(__('Não foi possível autenticar o access_token.'));
+            }
+        } catch (Throwable $exception) {
+            return response()->json([
+                                        'status' => [
+                                            'code' => Response::HTTP_UNAUTHORIZED,
+                                            'text' => $exception->getMessage()
+                                        ]
+                                    ],
+                                    Response::HTTP_UNAUTHORIZED
+            );
         }
 
         return $next($request);
@@ -120,10 +138,23 @@ class AuthenticateHubMiddleware
         $token = $request->bearerToken();
 
         if (is_null($token)) {
-            throw new AuthenticationException(__('Bearer token é obrigatório.'));
+            $this->thow(__('Bearer token é obrigatório.'));
         }
 
         $this->bearerToken = $token;
+    }
+
+    /**
+     * @param  string  $message
+     * @param  Throwable  $previous
+     *
+     * @return void
+     *
+     * @throws AuthenticationException
+     */
+    private function thow(string $message, ?Throwable $previous = null): void
+    {
+        throw new AuthenticationException($message, 0, $previous);
     }
 
     /**
@@ -136,6 +167,9 @@ class AuthenticateHubMiddleware
                 return $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id;
             }
         );
+
+        $userModel = app(config('hub.model_user'));
+        $userModel->findOrFail($userId, ['id']);
 
         return $this->loginByUserId($userId);
     }
@@ -176,8 +210,7 @@ class AuthenticateHubMiddleware
                     $builder
                         ->where('hub_uuid', $apiUser->uuid)
                         ->orWhereNull('hub_uuid');
-                }
-                )->firstOrFail();
+                })->firstOrFail();
 
             $user->hub_uuid = $apiUser->uuid;
         } catch (ModelNotFoundException $modelNotFoundException) {

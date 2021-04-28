@@ -94,6 +94,8 @@ Route::middleware('hub.auth')->get('/users/me', function () {
 
 When we installed the package, we created the `hub_uuid` column in your user table.
 
+Tf it is not possible to authenticate, the middleware will return 401.
+
 ## User Authenticated
 
 To access the token's user data directly, there is the ``\BildVitta\Hub\Contracts\Resources\AuthResourceContract``
