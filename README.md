@@ -1,3 +1,6 @@
+
+[![Total Downloads](https://img.shields.io/packagist/dt/bildvitta/iss-sdk.svg?style=flat-square)](https://packagist.org/packages/bildvitta/iss-sdk)
+
 # Introduction
 
 The ISS (International Space Station) aims to be a space station (`client`) of connection between the microservices of its ecosystem and the authentication and permissions microservice of the user that here is called in the script as Hub.permissions modules / microservices (Hub)
