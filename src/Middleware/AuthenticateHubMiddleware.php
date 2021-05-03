@@ -15,6 +15,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use stdClass;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class AuthAttemptMiddleware.
