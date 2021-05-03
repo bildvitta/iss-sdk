@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use stdClass;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -144,13 +145,12 @@ class AuthenticateHubMiddleware
     /**
      * @param  string  $message
      * @param  Throwable|null  $previous
-     * @param  Throwable  $previous
      *
      * @return void
      *
      * @throws AuthenticationException
      */
-    private function throw(string $message, ?Throwable $previous = null): void
+    private function throw(string $message, $previous = null): void
     {
         throw new AuthenticationException($message, 0, $previous);
     }
