@@ -1,9 +1,9 @@
 <?php
-/** @noinspection ALL */
 
 namespace BildVitta\Hub\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class HubUser.
@@ -12,24 +12,19 @@ use Illuminate\Database\Eloquent\Model;
  */
 class HubUser extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    use SoftDeletes;
 
     /**
      * The name of the "updated at" column.
      *
      * @var string|null
      */
-    protected $primaryKey = 'hub_uuid';
+    protected $primaryKey = null;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
-    protected $fillable = ['token', 'user_id'];
+    protected $fillable = ['token', 'user_id', 'company_uuid', 'company_name'];
 }

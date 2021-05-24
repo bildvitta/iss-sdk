@@ -24,6 +24,7 @@ class UserResource implements UserResourceContract
      */
     private const ENDPOINT_ME = self::PREFIX . '/me';
 
+    private const ENDPOINT_COMPANY = self::PREFIX . '/me';
     /**
      * @var Hub
      */
@@ -49,5 +50,10 @@ class UserResource implements UserResourceContract
     public function me(): Response
     {
         return $this->hub->request->get(self::ENDPOINT_ME)->throw();
+    }
+
+    public function company(): Response
+    {
+        return  $this->hub->request->get()
     }
 }

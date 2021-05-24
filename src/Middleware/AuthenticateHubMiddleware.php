@@ -98,7 +98,7 @@ class AuthenticateHubMiddleware
 
                     $user = $this->updateOrCreateUser($apiUser);
 
-                    $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
+                    $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id, 'company_uuid' => $apiUser->company, 'company_name' => $apiUser->company_name]);
 
                     $this->cacheService->put($this->cacheKey, $user->id);
 
