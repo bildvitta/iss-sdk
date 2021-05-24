@@ -26,5 +26,10 @@ class HubUser extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['token', 'user_id', 'company_uuid', 'company_name'];
+    protected $fillable = [
+        'token',
+        'user_id',
+        'company_uuid',
+        'company_name'
+    ];
 }

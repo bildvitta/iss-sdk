@@ -33,7 +33,6 @@ class IssSdkMigrations extends Migration
             Schema::table('hub_users', function (Blueprint $table) {
                 $table->uuid('company_uuid')->nullable();
                 $table->string('company_name')->nullable();
-                $table->string('company_email')->nullable();
             });
         }
 
@@ -43,7 +42,7 @@ class IssSdkMigrations extends Migration
             });
         }
 
-        Schema::table('hub_users', function(Blueprint $table) {
+        Schema::table('hub_users', function (Blueprint $table) {
             $table->timestamps();
             $table->softDeletes();
         });
