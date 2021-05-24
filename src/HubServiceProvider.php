@@ -26,7 +26,7 @@ class HubServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/hub.php', 'hub');
 
-        $this->app->singleton('hub', fn($app, $args) => new Hub($args[0] ?? null));
+        $this->app->singleton('hub', fn($app, $args) => new Hub($args[0] ?? request()->bearerToken()));
     }
 
     /**

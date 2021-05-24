@@ -3,6 +3,7 @@
 namespace BildVitta\Hub;
 
 use BildVitta\Hub\Resources\AuthResource;
+use BildVitta\Hub\Resources\CompanyResource;
 use BildVitta\Hub\Resources\UserResource;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
@@ -85,6 +86,14 @@ class Hub extends Factory
     public function users(): UserResource
     {
         return new UserResource($this);
+    }
+
+    /**
+     * @return CompanyResource
+     */
+    public function companies(): CompanyResource
+    {
+        return new CompanyResource($this);
     }
 
     /**
