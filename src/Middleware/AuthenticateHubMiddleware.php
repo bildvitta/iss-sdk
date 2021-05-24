@@ -10,12 +10,12 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use stdClass;
-use Illuminate\Database\Eloquent\Builder;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AuthAttemptMiddleware.
@@ -98,7 +98,12 @@ class AuthenticateHubMiddleware
 
                     $user = $this->updateOrCreateUser($apiUser);
 
-                    $this->hubUserModel->create(['token' => $this->bearerTokenHash, 'user_id' => $user->id]);
+                    $this->hubUserModel->create([
+                        'token' => $this->bearerTokenHash,
+                        'user_id' => $user->id,
+                        'company_uuid' => $apiUser->company,
+                        'company_name' => $apiUser->company_name
+                    ]);
 
                     $this->cacheService->put($this->cacheKey, $user->id);
 
