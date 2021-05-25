@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUndefinedClassInspection */
 
 namespace BildVitta\Hub\Middleware;
 
@@ -14,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -92,6 +92,8 @@ class AuthenticateHubMiddleware
 
             try {
                 $this->loginByCache();
+
+                $this->updatePermissions();
             } catch (ModelNotFoundException $modelNotFoundException) {
                 try {
                     $apiUser = $this->getUser();
@@ -106,6 +108,7 @@ class AuthenticateHubMiddleware
                     ]);
 
                     $this->cacheService->put($this->cacheKey, $user->id);
+                    $this->updatePermissions();
 
                     $this->loginByUserId($user->id);
                 } catch (RequestException $requestException) {
@@ -150,7 +153,7 @@ class AuthenticateHubMiddleware
 
     /**
      * @param  string  $message
-     * @param  Throwable|null  $previous
+     * @param  null  $previous
      *
      * @return void
      *
@@ -166,10 +169,9 @@ class AuthenticateHubMiddleware
      */
     private function loginByCache(): Authenticatable
     {
-        $userId = $this->cacheService->rememberForever($this->cacheKey,
-            function () {
-                return $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id;
-            }
+        $userId = $this->cacheService->rememberForever(
+            $this->cacheKey,
+            fn() => $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id
         );
 
         $userModel = app(config('hub.model_user'));
@@ -189,7 +191,43 @@ class AuthenticateHubMiddleware
     }
 
     /**
+     * @throws AuthenticationException
+     */
+    private function updatePermissions()
+    {
+        try {
+            $this->cacheService->remember($this->cacheKey . '_permissions', now()->addDay(), function () {
+                $permissions = $this->getPermissions();
+
+                foreach ($permissions as $permission) {
+                    Permission::findOrCreate($permission->name, $permission->guard_name);
+                }
+
+                auth()->user()->givePermissionTo(... collect($permissions)->pluck('name')->toArray());
+
+                return true;
+            });
+        } catch (RequestException $requestException) {
+            $this->throw(__('Não foi possível atualizar as permissões.'), $requestException);
+        }
+    }
+
+    /**
+     * @return array
+     *
+     * @throws RequestException
+     */
+    private function getPermissions(): array
+    {
+        $response = app('hub', [$this->bearerToken])->auth()->permissions();
+
+        return $response->object()->results;
+    }
+
+    /**
      * @return stdClass
+     *
+     * @throws RequestException
      */
     private function getUser(): stdClass
     {
