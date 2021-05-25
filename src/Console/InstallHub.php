@@ -25,13 +25,12 @@ class InstallHub extends Command
     ];
 
     /**
-     * Arguments to vendor migration publish.
+     * Publicando migrações do Laravel Permissions.
      *
      * @const array
      */
     private const VENDOR_PUBLISH_MIGRATION_PARAMS = [
-        '--provider' => HubServiceProvider::class,
-        '--tag' => 'hub-migration'
+        '--provider' => \Spatie\Permission\PermissionServiceProvider::class
     ];
 
     /**
@@ -120,7 +119,7 @@ class InstallHub extends Command
 
     private function shouldRunMigrations(): bool
     {
-        return $this->confirm('Run migrations? If you have already done this step, do not do it again!');
+        return $this->confirm('Run migrations of Laravel Permissions package? If you have already done this step, do not do it again!');
     }
 
     /**
