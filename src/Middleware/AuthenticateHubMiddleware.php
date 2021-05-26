@@ -2,6 +2,7 @@
 
 namespace BildVitta\Hub\Middleware;
 
+use BildVitta\Hub\Entities\HubCompany;
 use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Exceptions\AuthenticationException;
 use Closure;
@@ -75,8 +76,8 @@ class AuthenticateHubMiddleware
     }
 
     /**
-     * @param  Request  $request
-     * @param  Closure  $next
+     * @param Request $request
+     * @param Closure $next
      *
      * @return mixed
      *
@@ -102,9 +103,7 @@ class AuthenticateHubMiddleware
 
                     $this->hubUserModel->create([
                         'token' => $this->bearerTokenHash,
-                        'user_id' => $user->id,
-                        'company_uuid' => $apiUser->company,
-                        'company_name' => $apiUser->company_name
+                        'user_id' => $user->id
                     ]);
 
                     $this->cacheService->put($this->cacheKey, $user->id);
@@ -134,7 +133,7 @@ class AuthenticateHubMiddleware
     }
 
     /**
-     * @param  Request  $request
+     * @param Request $request
      *
      * @return void
      *
@@ -152,8 +151,8 @@ class AuthenticateHubMiddleware
     }
 
     /**
-     * @param  string  $message
-     * @param  null  $previous
+     * @param string $message
+     * @param null $previous
      *
      * @return void
      *
@@ -181,7 +180,7 @@ class AuthenticateHubMiddleware
     }
 
     /**
-     * @param  int  $userId
+     * @param int $userId
      *
      * @return Authenticatable
      */
@@ -209,6 +208,7 @@ class AuthenticateHubMiddleware
             });
         } catch (RequestException $requestException) {
             $this->throw(__('Não foi possível atualizar as permissões.'), $requestException);
+            return false;
         }
     }
 
@@ -237,7 +237,7 @@ class AuthenticateHubMiddleware
     }
 
     /**
-     * @param  stdClass  $apiUser
+     * @param stdClass $apiUser
      *
      * @return Authenticatable
      */
@@ -264,8 +264,29 @@ class AuthenticateHubMiddleware
             $user->password = bcrypt(uniqid(rand()));
         }
 
+        $hubCompany = $this->getCompany($apiUser->company);
+        try {
+            $company = HubCompany::where('uuid', '=', $apiUser->company)->firstOrFail();
+            $company->name = $hubCompany->name;
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            $company = new HubCompany();
+            $company->uuid = $hubCompany->uuid;
+            $company->name = $hubCompany->name;
+        }
+
+        $company->saveOrFail();
+
+        $user->company_id = $company->id;
+
         $user->saveOrFail();
 
         return $user;
+    }
+
+    private function getCompany(string $companyUuid): stdClass
+    {
+        $response = app('hub', [$this->bearerToken])->companies()->findByUuid($companyUuid);
+
+        return $response->object()->result;
     }
 }
