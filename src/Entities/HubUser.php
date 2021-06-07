@@ -14,12 +14,15 @@ class HubUser extends Model
 {
     use SoftDeletes;
 
+    public $incrementing = false;
+    protected $table = 'hub_users';
+
     /**
      * The name of the "updated at" column.
      *
      * @var string|null
      */
-    protected $primaryKey = null;
+    protected $primaryKey = 'token';
 
     /**
      * The attributes that are mass assignable.

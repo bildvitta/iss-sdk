@@ -2,7 +2,6 @@
 
 namespace BildVitta\Hub\Middleware;
 
-use BildVitta\Hub\Entities\HubCompany;
 use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Exceptions\AuthenticationException;
 use Closure;
@@ -244,6 +243,7 @@ class AuthenticateHubMiddleware
     private function updateOrCreateUser(stdClass $apiUser): Authenticatable
     {
         $userModel = app(config('hub.model_user'));
+        $companyModel = app(config('hub.model_company'));
 
         try {
             $user = $userModel
@@ -266,10 +266,10 @@ class AuthenticateHubMiddleware
 
         $hubCompany = $this->getCompany($apiUser->company);
         try {
-            $company = HubCompany::where('uuid', '=', $apiUser->company)->firstOrFail();
+            $company = $companyModel::where('uuid', '=', $apiUser->company)->firstOrFail();
             $company->name = $hubCompany->name;
         } catch (ModelNotFoundException $modelNotFoundException) {
-            $company = new HubCompany();
+            $company = new $companyModel();
             $company->uuid = $hubCompany->uuid;
             $company->name = $hubCompany->name;
         }
@@ -279,6 +279,7 @@ class AuthenticateHubMiddleware
         $user->company_id = $company->id;
 
         $user->saveOrFail();
+        $user->refresh();
 
         return $user;
     }
