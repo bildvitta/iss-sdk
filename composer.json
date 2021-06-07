@@ -1,54 +1,63 @@
 {
-    "name": "bildvitta/iss-sdk",
-    "description": "This package is used to communicate with the permission and authentication microservice.",
-    "type": "library",
-    "keywords": [
-        "bildvitta",
-        "laravel",
-        "hub",
-        "iss-sdk"
+  "name": "bildvitta/iss-sdk",
+  "description": "This package is used to communicate with the permission and authentication microservice.",
+  "type": "library",
+  "keywords": [
+    "bildvitta",
+    "laravel",
+    "hub",
+    "iss-sdk"
+  ],
+  "homepage": "https://github.com/bildvitta/iss-sdk",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jean C. Garcia",
+      "email": "jean.garcia@bild.com.br",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.4|^8.0",
+    "friendsofphp/php-cs-fixer": "^3.0",
+    "illuminate/contracts": "^8.0",
+    "illuminate/support": "^8.0",
+    "spatie/laravel-permission": "^4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "10.0.x-dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "BildVitta\\Hub\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BildVitta\\Hub\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "BildVitta\\Hub\\HubServiceProvider"
+      ],
+      "aliases": {
+        "hub": "BildVitta\\Hub\\Facades\\Hub"
+      }
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "scripts": {
+    "check-style": [
+      "vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php --diff --verbose --dry-run"
     ],
-    "homepage": "https://github.com/bildvitta/iss-sdk",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Jean C. Garcia",
-            "email": "jean.garcia@bild.com.br",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": "^7.4|^8.0",
-        "illuminate/contracts": "^8.0",
-        "illuminate/support": "^8.0",
-        "spatie/laravel-permission": "^4.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "10.0.x-dev"
-    },
-    "autoload": {
-        "psr-4": {
-            "BildVitta\\Hub\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "BildVitta\\Hub\\Tests\\": "tests/"
-        }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "BildVitta\\Hub\\HubServiceProvider"
-            ],
-            "aliases": {
-                "hub": "BildVitta\\Hub\\Facades\\Hub"
-            }
-        }
-    },
-    "prefer-stable": true,
-    "minimum-stability": "dev"
+    "fix-style": [
+      "vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php"
+    ]
+  }
 }

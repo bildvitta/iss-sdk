@@ -118,12 +118,13 @@ class AuthenticateHubMiddleware
                 $this->throw(__('Não foi possível autenticar o access_token.'));
             }
         } catch (Throwable $exception) {
-            return response()->json([
-                'status' => [
-                    'code' => Response::HTTP_UNAUTHORIZED,
-                    'text' => $exception->getMessage()
-                ]
-            ],
+            return response()->json(
+                [
+                    'status' => [
+                        'code' => Response::HTTP_UNAUTHORIZED,
+                        'text' => $exception->getMessage()
+                    ]
+                ],
                 Response::HTTP_UNAUTHORIZED
             );
         }
@@ -169,7 +170,7 @@ class AuthenticateHubMiddleware
     {
         $userId = $this->cacheService->rememberForever(
             $this->cacheKey,
-            fn() => $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id
+            fn () => $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id
         );
 
         $userModel = app(config('hub.model_user'));
@@ -248,11 +249,12 @@ class AuthenticateHubMiddleware
         try {
             $user = $userModel
                 ->whereEmail($apiUser->email)
-                ->where(function (Builder $builder) use ($apiUser) {
-                    $builder
+                ->where(
+                    function (Builder $builder) use ($apiUser) {
+                        $builder
                         ->where('hub_uuid', $apiUser->uuid)
                         ->orWhereNull('hub_uuid');
-                }
+                    }
                 )->firstOrFail();
 
             $user->hub_uuid = $apiUser->uuid;
