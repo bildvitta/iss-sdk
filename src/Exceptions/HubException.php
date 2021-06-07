@@ -12,5 +12,4 @@ use Throwable;
  */
 class HubException extends Exception implements Throwable
 {
-
 }

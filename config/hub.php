@@ -6,6 +6,7 @@ return [
 
     'prefix' => env('MS_HUB_API_PREFIX', '/api'),
 
-    'model_user' => '\App\Entities\User'
+    'model_user' => '\App\Entities\User',
 
+    'model_company' => '\BildVitta\Hub\Entities\HubCompany::class'
 ];

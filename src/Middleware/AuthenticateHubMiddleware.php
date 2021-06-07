@@ -2,7 +2,6 @@
 
 namespace BildVitta\Hub\Middleware;
 
-use BildVitta\Hub\Entities\HubCompany;
 use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Exceptions\AuthenticationException;
 use Closure;
@@ -119,12 +118,13 @@ class AuthenticateHubMiddleware
                 $this->throw(__('Não foi possível autenticar o access_token.'));
             }
         } catch (Throwable $exception) {
-            return response()->json([
-                'status' => [
-                    'code' => Response::HTTP_UNAUTHORIZED,
-                    'text' => $exception->getMessage()
-                ]
-            ],
+            return response()->json(
+                [
+                    'status' => [
+                        'code' => Response::HTTP_UNAUTHORIZED,
+                        'text' => $exception->getMessage()
+                    ]
+                ],
                 Response::HTTP_UNAUTHORIZED
             );
         }
@@ -170,7 +170,7 @@ class AuthenticateHubMiddleware
     {
         $userId = $this->cacheService->rememberForever(
             $this->cacheKey,
-            fn() => $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id
+            fn () => $this->hubUserModel->whereToken($this->bearerTokenHash)->firstOrFail()->user_id
         );
 
         $userModel = app(config('hub.model_user'));
@@ -244,15 +244,17 @@ class AuthenticateHubMiddleware
     private function updateOrCreateUser(stdClass $apiUser): Authenticatable
     {
         $userModel = app(config('hub.model_user'));
+        $companyModel = app(config('hub.model_company'));
 
         try {
             $user = $userModel
                 ->whereEmail($apiUser->email)
-                ->where(function (Builder $builder) use ($apiUser) {
-                    $builder
+                ->where(
+                    function (Builder $builder) use ($apiUser) {
+                        $builder
                         ->where('hub_uuid', $apiUser->uuid)
                         ->orWhereNull('hub_uuid');
-                }
+                    }
                 )->firstOrFail();
 
             $user->hub_uuid = $apiUser->uuid;
@@ -266,10 +268,10 @@ class AuthenticateHubMiddleware
 
         $hubCompany = $this->getCompany($apiUser->company);
         try {
-            $company = HubCompany::where('uuid', '=', $apiUser->company)->firstOrFail();
+            $company = $companyModel::where('uuid', '=', $apiUser->company)->firstOrFail();
             $company->name = $hubCompany->name;
         } catch (ModelNotFoundException $modelNotFoundException) {
-            $company = new HubCompany();
+            $company = new $companyModel();
             $company->uuid = $hubCompany->uuid;
             $company->name = $hubCompany->name;
         }
@@ -279,6 +281,7 @@ class AuthenticateHubMiddleware
         $user->company_id = $company->id;
 
         $user->saveOrFail();
+        $user->refresh();
 
         return $user;
     }
