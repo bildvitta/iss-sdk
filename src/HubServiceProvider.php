@@ -45,9 +45,9 @@ class HubServiceProvider extends ServiceProvider
             );
         }
 
+        $this->loadRoutesFrom(__DIR__ . '../routes/api.php');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->commands([InstallHub::class]);
-
 
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('hub.auth', AuthenticateHubMiddleware::class);
