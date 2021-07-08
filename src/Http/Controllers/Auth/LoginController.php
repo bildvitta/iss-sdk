@@ -25,6 +25,7 @@ class LoginController extends AuthController
             'response_type' => 'code',
             'scope' => config('hub.oauth.scopes'),
             'state' => $state,
+            'url' => $request->get('url', '/')
         ]);
 
         $redirect_uri = config('hub.front_uri') . config('hub.oauth.authorize_uri') . '?' . $query;
