@@ -3,7 +3,6 @@
 
 namespace BildVitta\Hub\Http\Controllers\Users;
 
-
 use BildVitta\Hub\Http\Requests\MeRequest;
 use Illuminate\Support\Facades\Http;
 

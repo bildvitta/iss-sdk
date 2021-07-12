@@ -5,7 +5,6 @@ namespace BildVitta\Hub\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-
 class MeRequest extends FormRequest
 {
     /**
