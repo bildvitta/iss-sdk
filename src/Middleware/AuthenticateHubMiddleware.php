@@ -202,9 +202,12 @@ class AuthenticateHubMiddleware
                     Permission::findOrCreate($permission->name, $permission->guard_name);
                 }
 
-                auth()->user()->givePermissionTo(... collect($permissions)->pluck('name')->toArray());
+                if (!empty($permissions)) {
+                    auth()->user()->givePermissionTo(... collect($permissions)->pluck('name')->toArray());
+                    return true;
+                }
 
-                return true;
+                return false;
             });
         } catch (RequestException $requestException) {
             $this->throw(__('Não foi possível atualizar as permissões.'), $requestException);
@@ -252,8 +255,8 @@ class AuthenticateHubMiddleware
                 ->where(
                     function (Builder $builder) use ($apiUser) {
                         $builder
-                        ->where('hub_uuid', $apiUser->uuid)
-                        ->orWhereNull('hub_uuid');
+                            ->where('hub_uuid', $apiUser->uuid)
+                            ->orWhereNull('hub_uuid');
                     }
                 )->firstOrFail();
 
