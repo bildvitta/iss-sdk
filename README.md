@@ -27,11 +27,26 @@ This is the contents of the published config file:
 
 ```php
 return [
+    'base_uri' => env('MS_HUB_BASE_URI', 'https://api-dev-hub.nave.dev'),
 
-    'base_uri' => env('MS_HUB_BASE_URI', 'https://api.almobi.com.br'),
+    'front_uri' => env('MS_HUB_FRONT_URI', 'https://develop.hub.nave.dev'),
 
-    'prefix' => env('MS_HUB_PREFIX', '/api'),
+    'prefix' => env('MS_HUB_API_PREFIX', '/api'),
 
+    'model_user' => '\App\Entities\User',
+
+    'model_company' => '\BildVitta\Hub\Entities\HubCompany::class',
+
+    'oauth' => [
+        'client_id' => env('HUB_CLIENT_ID', ''),
+        'client_secret' => env('HUB_CLIENT_SECRET', ''),
+        'redirect' => env('HUB_REDIRECT_URI', ''),
+        'scopes' => env('HUB_SCOPE', 'profile'),
+
+        'authorize_uri' => '/auth/authorize',
+        'token_uri' => '/oauth/token',
+        'userinfo_uri' => '/users/me'
+    ]
 ];
 ```
 
@@ -39,7 +54,7 @@ With the configuration file `` hub.php`` published in your configuration folder 
 variables in your `` .env`` file:
 
 ```dotenv
-MS_HUB_BASE_URI="https://api.almobi.com.br"
+MS_HUB_BASE_URI="https://api-dev-hub.nave.dev"
 
 MS_HUB_PREFIX="/api"
 ```

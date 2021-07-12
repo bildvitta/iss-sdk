@@ -26,7 +26,7 @@ class HubServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/hub.php', 'hub');
 
-        $this->app->singleton('hub', fn($app, $args) => new Hub($args[0] ?? request()->bearerToken()));
+        $this->app->singleton('hub', fn ($app, $args) => new Hub($args[0] ?? request()->bearerToken()));
     }
 
     /**
@@ -45,9 +45,9 @@ class HubServiceProvider extends ServiceProvider
             );
         }
 
+        $this->loadRoutesFrom(__DIR__ . '../routes/api.php');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->commands([InstallHub::class]);
-
 
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('hub.auth', AuthenticateHubMiddleware::class);
