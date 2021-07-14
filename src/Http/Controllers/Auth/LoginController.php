@@ -21,7 +21,7 @@ class LoginController extends AuthController
 
         $query = http_build_query([
             'client_id' => config('hub.oauth.client_id'),
-            'redirect_uri' => config('hub.oauth.client_id'),
+            'redirect_uri' => config('hub.oauth.redirect'),
             'response_type' => 'code',
             'scope' => config('hub.oauth.scopes'),
             'state' => $state,
