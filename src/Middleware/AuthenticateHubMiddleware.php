@@ -88,7 +88,7 @@ class AuthenticateHubMiddleware
             $this->setToken($request);
 
             $this->bearerTokenHash = md5($this->bearerToken);
-            $this->cacheKey = 'access_token_user_id_' . $this->bearerTokenHash;
+            $this->cacheKey = 'access_token_user_id_'.$this->bearerTokenHash;
 
             try {
                 $this->loginByCache();
@@ -102,9 +102,7 @@ class AuthenticateHubMiddleware
 
                     $this->hubUserModel->create([
                         'token' => $this->bearerTokenHash,
-                        'user_id' => $user->id,
-                        'company_uuid' => $apiUser->company,
-                        'company_name' => $apiUser->company_name
+                        'user_id' => $user->id
                     ]);
 
                     $this->cacheService->put($this->cacheKey, $user->id);
@@ -120,12 +118,13 @@ class AuthenticateHubMiddleware
                 $this->throw(__('Não foi possível autenticar o access_token.'));
             }
         } catch (Throwable $exception) {
-            return response()->json([
-                'status' => [
-                    'code' => Response::HTTP_UNAUTHORIZED,
-                    'text' => $exception->getMessage()
-                ]
-            ],
+            return response()->json(
+                [
+                    'status' => [
+                        'code' => Response::HTTP_UNAUTHORIZED,
+                        'text' => $exception->getMessage()
+                    ]
+                ],
                 Response::HTTP_UNAUTHORIZED
             );
         }
@@ -196,32 +195,36 @@ class AuthenticateHubMiddleware
     private function updatePermissions()
     {
         try {
-            $this->cacheService->remember($this->cacheKey . '_permissions', now()->addDay(), function () {
+            $this->cacheService->remember($this->cacheKey.'_permissions', now()->addDay(), function () {
                 $permissions = $this->getPermissions();
 
-                foreach ($permissions as $permission) {
-                    Permission::findOrCreate($permission->name, $permission->guard_name);
-                }
+                if (is_array($permissions)) {
+                    foreach ($permissions as $permission) {
+                        Permission::findOrCreate($permission->name, $permission->guard_name);
+                    }
 
-                auth()->user()->givePermissionTo(... collect($permissions)->pluck('name')->toArray());
+                    auth()->user()->givePermissionTo(... collect($permissions)->pluck('name')->toArray());
+                }
 
                 return true;
             });
         } catch (RequestException $requestException) {
             $this->throw(__('Não foi possível atualizar as permissões.'), $requestException);
+
+            return false;
         }
     }
 
     /**
-     * @return array
+     * @return array|null
      *
      * @throws RequestException
      */
-    private function getPermissions(): array
+    private function getPermissions(): ?array
     {
         $response = app('hub', [$this->bearerToken])->auth()->permissions();
 
-        return $response->object()->results;
+        return $response->object()->results ?? null;
     }
 
     /**
@@ -244,15 +247,17 @@ class AuthenticateHubMiddleware
     private function updateOrCreateUser(stdClass $apiUser): Authenticatable
     {
         $userModel = app(config('hub.model_user'));
+        $companyModel = app(config('hub.model_company'));
 
         try {
             $user = $userModel
                 ->whereEmail($apiUser->email)
-                ->where(function (Builder $builder) use ($apiUser) {
-                    $builder
-                        ->where('hub_uuid', $apiUser->uuid)
-                        ->orWhereNull('hub_uuid');
-                }
+                ->where(
+                    function (Builder $builder) use ($apiUser) {
+                        $builder
+                            ->where('hub_uuid', $apiUser->uuid)
+                            ->orWhereNull('hub_uuid');
+                    }
                 )->firstOrFail();
 
             $user->hub_uuid = $apiUser->uuid;
@@ -264,8 +269,33 @@ class AuthenticateHubMiddleware
             $user->password = bcrypt(uniqid(rand()));
         }
 
+        if (! is_null($apiUser->company)) {
+            $hubCompany = $this->getCompany($apiUser->company);
+
+            try {
+                $company = $companyModel::where('uuid', '=', $apiUser->company)->firstOrFail();
+                $company->name = $hubCompany->name;
+            } catch (ModelNotFoundException $modelNotFoundException) {
+                $company = new $companyModel();
+                $company->uuid = $hubCompany->uuid;
+                $company->name = $hubCompany->name;
+            } finally {
+                $company->saveOrFail();
+
+                $user->company_id = $company->id;
+            }
+        }
+
         $user->saveOrFail();
+        $user->refresh();
 
         return $user;
+    }
+
+    private function getCompany(string $companyUuid): stdClass
+    {
+        $response = app('hub', [$this->bearerToken])->companies()->findByUuid($companyUuid);
+
+        return $response->object()->result;
     }
 }
