@@ -20,6 +20,7 @@
   "require": {
     "php": "^7.4|^8.0",
     "illuminate/cache": "^8.49",
+    "illuminate/config": "^8.50",
     "illuminate/contracts": "^8.0",
     "illuminate/routing": "^8.49",
     "illuminate/support": "^8.0",
