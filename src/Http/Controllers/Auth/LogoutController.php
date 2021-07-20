@@ -5,7 +5,9 @@ namespace BildVitta\Hub\Http\Controllers\Auth;
 
 use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Http\Requests\LogoutRequest;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class LogoutController
@@ -15,13 +17,13 @@ class LogoutController extends AuthController
 {
     public function __invoke(LogoutRequest $request)
     {
-        $logout_uri = config('hub.base_uri') . config('hub.prefix') . '/auth/logout';
-        $response = Http::withHeaders([
+        $token_uri = config('hub.base_uri') . config('hub.prefix') . '/auth/logout';
+        $headers = [
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $request->bearerToken()
-        ])->post($logout_uri);
-
+            'Authorization' => $request->headers->get('Authorization')
+        ];
+        $response = Http::withHeaders($headers)->post($token_uri);
         HubUser::where('user_id', '=', $request->user()->id)->delete();
-        return $response->json();
+        return new Response($response->json(), $response->status());
     }
 }
