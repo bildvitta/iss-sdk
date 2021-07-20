@@ -7,7 +7,6 @@ use BildVitta\Hub\Entities\HubUser;
 use BildVitta\Hub\Http\Requests\LogoutRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class LogoutController
@@ -23,7 +22,12 @@ class LogoutController extends AuthController
             'Authorization' => $request->headers->get('Authorization')
         ];
         $response = Http::withHeaders($headers)->post($token_uri);
+        $responseJson = $response->json();
+        if ($response->status() == Response::HTTP_OK) {
+            $responseJson['url'] = config('hub.front_uri');
+        }
+
         HubUser::where('user_id', '=', $request->user()->id)->delete();
-        return new Response($response->json(), $response->status());
+        return new Response($responseJson, $response->status());
     }
 }
