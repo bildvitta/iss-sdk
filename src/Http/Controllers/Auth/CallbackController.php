@@ -3,6 +3,7 @@
 
 namespace BildVitta\Hub\Http\Controllers\Auth;
 
+use BildVitta\Hub\Entities\HubOauthToken;
 use BildVitta\Hub\Http\Requests\CallbackRequest;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -33,6 +34,14 @@ class CallbackController extends AuthController
             'redirect_uri' => config('hub.oauth.redirect'),
             'code' => $request->code,
         ]);
+
+        $jsonCache = $response->json();
+        $jsonCache['expires_in_dt'] = now()->addSeconds($response->json('expires_in'));
+        cache()->put(
+            md5($response->json('access_token')),
+            new HubOauthToken($jsonCache),
+            now()->addSeconds($response->json('expires_in'))
+        );
 
         $json = $response->json();
         $json['redirect'] = $url;
