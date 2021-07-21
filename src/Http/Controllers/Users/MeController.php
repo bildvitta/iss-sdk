@@ -4,6 +4,7 @@
 namespace BildVitta\Hub\Http\Controllers\Users;
 
 use BildVitta\Hub\Http\Requests\MeRequest;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 
 class MeController extends UsersController
@@ -18,6 +19,6 @@ class MeController extends UsersController
             $token_uri
         );
 
-        return $response->json();
+        return new Response($response, $response->status());
     }
 }
