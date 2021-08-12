@@ -68,7 +68,7 @@ trait LoginUser
         }
 
         $this->updateUserPermissions($user, $apiUser);
-        $user = $this->getUserCompany($user, $apiUser);
+//        $user = $this->getUserCompany($user, $apiUser);
 
         return $user;
     }
@@ -84,6 +84,11 @@ trait LoginUser
             return true;
         }
         return false;
+    }
+
+    protected function loginByUserId(int $userId): Authenticatable
+    {
+        return $this->app('auth')->loginUsingId($userId);
     }
 
     protected function getUserCompany($user, stdClass $apiUser)
@@ -110,10 +115,5 @@ trait LoginUser
     {
         $response = app('hub', [''])->companies()->findByUuid($companyUuid);
         return $response->object()->result;
-    }
-
-    protected function loginByUserId(int $userId): Authenticatable
-    {
-        return $this->app('auth')->loginUsingId($userId);
     }
 }
