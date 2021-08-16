@@ -11,7 +11,7 @@ use Illuminate\Http\Client\Response;
  *
  * @package BildVitta\Hub\Resources
  */
-class CompanyResource
+class CompanyResource extends Resource
 {
     /**
      * @const string
@@ -31,7 +31,7 @@ class CompanyResource
     /**
      * AuthResource constructor.
      *
-     * @param  Hub  $hub
+     * @param Hub $hub
      */
     public function __construct(Hub $hub)
     {
@@ -41,7 +41,7 @@ class CompanyResource
     /**
      * Checks if the token passed by parameter or previously loaded in the ISS Service is valid.
      *
-     * @param  string  $uuid
+     * @param string $uuid
      *
      * @return Response
      *
@@ -51,6 +51,8 @@ class CompanyResource
     {
         $url = vsprintf(self::ENDPOINT_FIND_BY_UUID, [$uuid]);
 
-        return $this->hub->request->get($url)->throw();
+        $hubUrl = $this->hub->setToken('', true);
+
+        return $hubUrl->request->get($url)->throw();
     }
 }
