@@ -23,7 +23,7 @@ trait LoginUser
                 $cacheKey,
                 fn () => $hubUser->user_id
             );
-            $userModel = $this->app('config')->get('hub.model_user');
+            $userModel = $this->app($this->app('config')->get('hub.model_user'));
             $userModel->findOrFail($userId, ['id']);
         } catch (ModelNotFoundException $e) {
             $apiUser = $this->getUser($bearerToken);
