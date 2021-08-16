@@ -8,7 +8,6 @@ use BildVitta\Hub\Resources\UserResource;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class Hub.
@@ -117,17 +116,12 @@ class Hub extends Factory
     private function getToken()
     {
         $hubUrl = config('hub.base_uri') . config('hub.oauth.token_uri');
-        Log::driver('stderr')->debug($hubUrl);
-        Log::driver('stderr')->debug(config('hub.programatic_access.client_id'));
-        Log::driver('stderr')->debug(config('hub.programatic_access.client_secret'));
         $response = Http::asForm()->post($hubUrl, [
             'grant_type' => 'client_credentials',
             'client_id' => config('hub.programatic_access.client_id'),
             'client_secret' => config('hub.programatic_access.client_secret'),
             'scope' => '*',
         ]);
-
-        Log::driver('stderr')->debug($response->json());
         return $response->throw()->json('access_token');
     }
 }
