@@ -45,11 +45,11 @@ class AuthenticateHubMiddleware extends AuthenticateHubHelpers
 
             $user = $this->loginUserByCache($cacheHash, $cacheKey, $token);
         } catch (Exception $e) {
-            Log::driver('strerr')->error($e->getMessage());
+            Log::error($e->getMessage());
             return response()->json([
                 'status' => [
                     'code' => Response::HTTP_UNAUTHORIZED,
-                    'text' => $e->getMessage()
+                    'text' => json_encode($e->getMessage())
                 ]
             ], Response::HTTP_UNAUTHORIZED);
         }
