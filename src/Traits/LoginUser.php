@@ -68,7 +68,7 @@ trait LoginUser
         }
 
         $this->updateUserPermissions($user, $apiUser);
-//        $user = $this->getUserCompany($user, $apiUser);
+        $user = $this->getUserCompany($user, $apiUser);
 
         return $user;
     }
