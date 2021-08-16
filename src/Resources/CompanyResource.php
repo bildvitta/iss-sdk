@@ -16,7 +16,7 @@ class CompanyResource extends Resource
     /**
      * @const string
      */
-    private const PREFIX = '/companies';
+    private const PREFIX = '/programmatic/companies';
 
     /**
      * @const string
