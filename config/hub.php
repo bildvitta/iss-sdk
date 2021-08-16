@@ -11,6 +11,11 @@ return [
 
     'model_company' => '\BildVitta\Hub\Entities\HubCompany::class',
 
+    'programatic_access' => [
+        'client_id' => '',
+        'client_secret' => ''
+    ],
+
     'oauth' => [
         'client_id' => env('HUB_CLIENT_ID', ''),
         'client_secret' => env('HUB_CLIENT_SECRET', ''),

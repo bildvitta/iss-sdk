@@ -12,7 +12,7 @@ use Illuminate\Http\Client\Response;
  *
  * @package BildVitta\Hub\Resources
  */
-class UserResource implements UserResourceContract
+class UserResource extends Resource implements UserResourceContract
 {
     /**
      * @const string
@@ -32,7 +32,7 @@ class UserResource implements UserResourceContract
     /**
      * UserResource constructor.
      *
-     * @param  Hub  $hub
+     * @param Hub $hub
      */
     public function __construct(Hub $hub)
     {

@@ -12,7 +12,7 @@ use Illuminate\Http\Client\Response;
  *
  * @package BildVitta\Hub\Resources
  */
-class AuthResource implements AuthResourceContract
+class AuthResource extends Resource implements AuthResourceContract
 {
     /**
      * @const string
@@ -37,7 +37,7 @@ class AuthResource implements AuthResourceContract
     /**
      * AuthResource constructor.
      *
-     * @param  Hub  $hub
+     * @param Hub $hub
      */
     public function __construct(Hub $hub)
     {
@@ -47,7 +47,7 @@ class AuthResource implements AuthResourceContract
     /**
      * Checks if the token passed by parameter or previously loaded in the ISS Service is valid.
      *
-     * @param  string  $token
+     * @param string $token
      *
      * @return bool
      *
