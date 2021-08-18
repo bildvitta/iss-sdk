@@ -77,18 +77,20 @@ trait LoginUser
     {
         $permissions = $apiUser->user_permissions;
         foreach ($permissions as $key => $value) {
-            $findPermission = Permission::findOrCreate("$key.$value", 'web');
+            if (is_array($value)) {
+                foreach ($value as $array) {
+                    $findPermission = Permission::findOrCreate("$key.$array", 'web');
+                }
+            } else {
+                $findPermission = Permission::findOrCreate("$key.$value", 'web');
+            }
         }
+
         if (!empty($permissions)) {
             $user->givePermissionTo(... collect($permissions)->pluck('name')->toArray());
             return true;
         }
         return false;
-    }
-
-    protected function loginByUserId(int $userId): Authenticatable
-    {
-        return $this->app('auth')->loginUsingId($userId);
     }
 
     protected function getUserCompany($user, stdClass $apiUser)
@@ -115,5 +117,10 @@ trait LoginUser
     {
         $response = app('hub', [''])->companies()->findByUuid($companyUuid);
         return $response->object()->result;
+    }
+
+    protected function loginByUserId(int $userId): Authenticatable
+    {
+        return $this->app('auth')->loginUsingId($userId);
     }
 }
