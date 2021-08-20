@@ -16,7 +16,7 @@ class ProgrammaticMiddleware extends AuthenticateHubHelpers
     public function handle(Request $request, Closure $next)
     {
         # POG
-        if ($request->header('Almobi-Host') == "Hub") {
+        if (strtolower($request->header('Almobi-Host')) == "hub") {
             return $next($request);
         }
 
