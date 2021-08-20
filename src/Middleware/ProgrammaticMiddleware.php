@@ -15,6 +15,11 @@ class ProgrammaticMiddleware extends AuthenticateHubHelpers
 {
     public function handle(Request $request, Closure $next)
     {
+        # POG
+        if ($request->header('Almobi-Host') == "Hub") {
+            return $next($request);
+        }
+
         try {
             $token = $this->setToken($request);
 
@@ -38,6 +43,7 @@ class ProgrammaticMiddleware extends AuthenticateHubHelpers
     private function checkCredentials(string $token)
     {
         $url = $this->app('config')->get('hub.base_uri') . $this->app('config')->get('hub.prefix') . '/programmatic/check';
+        Log::debug($url);
         return Http::withHeaders([
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $token
