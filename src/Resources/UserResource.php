@@ -6,6 +6,7 @@ use BildVitta\Hub\Contracts\Resources\UserResourceContract;
 use BildVitta\Hub\Hub;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Config;
 
 /**
  * Class UserResource.
@@ -48,6 +49,10 @@ class UserResource extends Resource implements UserResourceContract
      */
     public function me(): Response
     {
-        return $this->hub->request->get(self::ENDPOINT_ME)->throw();
+        $params = [
+            'project' => Config::get('app.slug', '')
+        ];
+        $endpoint = self::ENDPOINT_ME . '?' . http_build_query($params);
+        return $this->hub->request->get($endpoint)->throw();
     }
 }
