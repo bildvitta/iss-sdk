@@ -18,6 +18,11 @@ use Illuminate\Support\Facades\Log;
 class Hub extends Factory
 {
     /**
+     * @const string
+     */
+    public const PREFIX_PROGRAMMATIC = '/programmatic';
+
+    /**
      * @const array
      */
     private const DEFAULT_HEADERS = [
@@ -49,7 +54,7 @@ class Hub extends Factory
     /**
      * Hub constructor.
      *
-     * @param  ?string $token
+     * @param  ?string  $token
      */
     public function __construct(?string $token = null)
     {
@@ -65,7 +70,7 @@ class Hub extends Factory
      */
     private function prepareRequest(): PendingRequest
     {
-        $this->baseUrl = config('hub.base_uri') . config('hub.prefix');
+        $this->baseUrl = config('hub.base_uri').config('hub.prefix');
 
         return $this->request = Http::withToken($this->token)
             ->baseUrl($this->baseUrl)
@@ -98,14 +103,15 @@ class Hub extends Factory
     }
 
     /**
-     * @param string $token
+     * @param  string|null  $token
+     * @param  bool         $programmatic
      *
      * @return Hub
      */
-    public function setToken(string $token, bool $programatic = false): Hub
+    public function setToken(?string $token = null, bool $programmatic = false): Hub
     {
         $this->token = $token;
-        if ($programatic) {
+        if ($programmatic) {
             $this->token = $this->getToken();
         }
 
@@ -116,7 +122,7 @@ class Hub extends Factory
 
     private function getToken()
     {
-        $hubUrl = config('hub.base_uri') . config('hub.oauth.token_uri');
+        $hubUrl = config('hub.base_uri').config('hub.oauth.token_uri');
         Log::driver('stderr')->debug($hubUrl);
         Log::driver('stderr')->debug(config('hub.programatic_access.client_id'));
         Log::driver('stderr')->debug(config('hub.programatic_access.client_secret'));
@@ -128,6 +134,7 @@ class Hub extends Factory
         ]);
 
         Log::driver('stderr')->debug($response->json());
+
         return $response->throw()->json('access_token');
     }
 }
