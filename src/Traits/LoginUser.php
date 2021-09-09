@@ -87,6 +87,7 @@ trait LoginUser
     protected function updateUserPermissions($user, stdClass $apiUser)
     {
         $permissions = $apiUser->user_permissions;
+        $userPermissions = [];
         foreach ($permissions as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $array) {
@@ -95,10 +96,11 @@ trait LoginUser
             } else {
                 $findPermission = Permission::findOrCreate("$key.$value", 'web');
             }
+            $userPermissions[] = $findPermission;
         }
 
         if (!empty($permissions)) {
-            $user->givePermissionTo(... collect($permissions)->pluck('name')->toArray());
+            $user->givePermissionTo(... collect($userPermissions)->pluck('name')->toArray());
             return true;
         }
         return false;
