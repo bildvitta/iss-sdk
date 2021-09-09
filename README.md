@@ -157,6 +157,26 @@ try {
 }
 ```
 
+### Adding permission scope to entity listing.
+
+Now we have added a scope that filters by the permission level of the logged in user.
+To use it is very simple, just add in the global scopes the PermissionScope class passing the permission that the user has to have, and then the magic happens ;D
+
+Code example:
+```php
+use BildVitta\Hub\Scopes\PermissionScope;
+
+$query = RealEstateDevelopment::query();
+$query->withGlobalScope('permission', new PermissionScope('real_estate_developments.show'));
+
+$count = $query->count();
+$query->pagination();
+
+return (new RealEstateDevelopmentResource('index', $query->get()))->count($count);
+```
+
+Remembering that the scope name has to be permission, if not, it doesn't work <3
+
 ## Testing
 
 coming soon...
