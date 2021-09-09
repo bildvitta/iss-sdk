@@ -67,7 +67,7 @@ class UserResource extends Resource implements UserResourceContract
 
         if ($programatic) {
             $endpoint = $this->hub::PREFIX_PROGRAMMATIC . self::ENDPOINT_FIND_BY_UUID;
-            $this->hub = $this->hub->setToken(programmatic: true);
+            $this->hub = $this->hub->setToken('', true);
         }
 
         $url = vsprintf($endpoint, [$uuid]);
