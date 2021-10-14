@@ -7,9 +7,9 @@ return [
 
     'prefix' => env('MS_HUB_API_PREFIX', '/api'),
 
-    'model_user' => '\App\Entities\User',
+    'model_user' => \App\Models\User::class,
 
-    'model_company' => '\BildVitta\Hub\Entities\HubCompany::class',
+    'model_company' => \BildVitta\Hub\Entities\HubCompany::class,
 
     'programatic_access' => [
         'client_id' => env('HUB_PROGRAMMATIC_CLIENT'),
