@@ -1,10 +1,11 @@
-
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/bildvitta/iss-sdk.svg?style=flat-square)](https://packagist.org/packages/bildvitta/iss-sdk)
 [![Total Downloads](https://img.shields.io/packagist/dt/bildvitta/iss-sdk.svg?style=flat-square)](https://packagist.org/packages/bildvitta/iss-sdk)
 
 # Introduction
 
-The ISS (International Space Station) aims to be a space station (`client`) of connection between the microservices of its ecosystem and the authentication and permissions microservice of the user that here is called in the script as Hub.permissions modules / microservices (Hub)
+The ISS (International Space Station) aims to be a space station (`client`) of connection between the microservices of
+its ecosystem and the authentication and permissions microservice of the user that here is called in the script as
+Hub.permissions modules / microservices (Hub)
 
 # Installation
 
@@ -66,8 +67,9 @@ MS_HUB_PREFIX="/api"
 
 # Usage
 
-All requests made to the ISS Service will return an instance of [``\Illuminate\Http\Client\Response``](https://laravel.com/api/8.x/Illuminate/Http/Client/Response.html), which implements
-the PHP `` ArrayAccess`` interface, allowing you to access JSON response data directly in the response
+All requests made to the ISS Service will return an instance
+of [``\Illuminate\Http\Client\Response``](https://laravel.com/api/8.x/Illuminate/Http/Client/Response.html), which
+implements the PHP `` ArrayAccess`` interface, allowing you to access JSON response data directly in the response
 
 This also means that a variety of methods that can be used to inspect the response, follow some below:
 
@@ -106,7 +108,8 @@ $hub = BildVitta\Hub\Facades\Hub::setToken($token); // instance 1
 
 ## Authenticating User
 
-To authenticate the Hub user in your module, it is necessary to use the middleware `hub.auth = \ BildVitta \ Hub \ Middleware \ AuthenticateHubMiddleware`.
+To authenticate the Hub user in your module, it is necessary to use the
+middleware `hub.auth = \ BildVitta \ Hub \ Middleware \ AuthenticateHubMiddleware`.
 
 It will validate the token and create, if it does not exist, the user of the token in its user table.
 
@@ -159,10 +162,12 @@ try {
 
 ### Adding permission scope to entity listing.
 
-Now we have added a scope that filters by the permission level of the logged in user.
-To use it is very simple, just add in the global scopes the PermissionScope class passing the permission that the user has to have, and then the magic happens ;D
+Now we have added a scope that filters by the permission level of the logged in user. To use it is very simple, just add
+in the global scopes the PermissionScope class passing the permission that the user has to have, and then the magic
+happens ;D
 
 Code example:
+
 ```php
 use BildVitta\Hub\Scopes\PermissionScope;
 
@@ -176,6 +181,48 @@ return (new RealEstateDevelopmentResource('index', $query->get()))->count($count
 ```
 
 Remembering that the scope name has to be permission, if not, it doesn't work <3
+
+## Logging
+
+To generate the log, just put the settings in the `config/logging.php` file
+
+```php
+[
+    
+
+    'channels' => [
+        'stack' => [
+            'driver' => 'stack',
+            'channels' => ['single', 'stderr', 'satelliteX9'], # Add satelliteX9 on channels
+            'ignore_exceptions' => false,
+        ],
+        
+        ...
+        
+        'satelliteX9' => [
+            'driver' => 'custom',
+            'via' => BildVitta\Hub\Logging\SatelliteX9Logger::class,
+            'with' => [
+                'app_url' => env('SATELLITE_X9_URL', ''),
+                'app_endpoint' => env('SATELLITE_X9_ENDPOINT', ''),
+                'app_module' => env('SATELLITE_X9_MODULE', '')
+            ]
+        ]
+    ]
+]
+```
+
+After the configuration, just use the normal Laravel Log. Passing the entity, entity uuid and action attributes as arguments.
+
+```php
+use Log;
+
+Log::info(__('Created user'), [
+    'entity' => 'user',
+    'entity_uuid' => $user->uuid,
+    'action' => 'store'
+]);
+```
 
 ## Testing
 
