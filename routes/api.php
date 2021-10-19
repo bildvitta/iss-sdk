@@ -5,6 +5,7 @@ use BildVitta\Hub\Http\Controllers\Auth\LoginController;
 use BildVitta\Hub\Http\Controllers\Auth\LogoutController;
 use BildVitta\Hub\Http\Controllers\Auth\RefreshController;
 use BildVitta\Hub\Http\Controllers\Users\MeController;
+use BildVitta\Hub\Http\Controllers\Users\MeEditController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/auth')->middleware(['throttle'])->group(function () {
