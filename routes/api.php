@@ -19,4 +19,5 @@ Route::prefix('api/auth')->middleware(['throttle'])->group(function () {
 
 Route::prefix('api/users/')->middleware('hub.auth')->group(function () {
     Route::get('me')->name('users.me')->uses(MeController::class);
+    Route::get('me/edit')->name('users.edit')->uses(MeEditController::class);
 });
