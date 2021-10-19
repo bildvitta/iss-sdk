@@ -22,6 +22,7 @@
     "illuminate/cache": "^8.49",
     "illuminate/config": "^8.50",
     "illuminate/contracts": "^8.0",
+    "illuminate/log": "^8.65",
     "illuminate/routing": "^8.49",
     "illuminate/support": "^8.0",
     "illuminate/view": "^8.49",
