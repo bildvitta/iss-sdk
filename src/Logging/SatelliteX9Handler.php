@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Http;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
-
 class SatelliteX9Handler extends AbstractProcessingHandler
 {
     protected array $config = [];
