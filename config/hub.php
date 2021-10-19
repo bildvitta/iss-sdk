@@ -25,5 +25,10 @@ return [
         'authorize_uri' => '/auth/authorize',
         'token_uri' => '/oauth/token',
         'userinfo_uri' => '/users/me'
+    ],
+
+    'redirects' => [
+        'userinfo_edit' => '/me'
     ]
+
 ];
