@@ -17,7 +17,7 @@ class MeEditController extends UsersController
      */
     public function __invoke(MeEditRequest $request): JsonResponse
     {
-        $redirect_uri = Config::get('hub.base_uri') . Config::get('hub.redirects.userinfo_edit');
+        $redirect_uri = Config::get('hub.front_uri') . Config::get('hub.redirects.userinfo_edit');
         
         return response()->json(
             [
