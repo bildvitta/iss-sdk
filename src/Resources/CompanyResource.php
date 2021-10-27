@@ -3,6 +3,7 @@
 namespace BildVitta\Hub\Resources;
 
 use BildVitta\Hub\Hub;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 
@@ -36,6 +37,19 @@ class CompanyResource extends Resource
     public function __construct(Hub $hub)
     {
         $this->hub = $hub;
+    }
+
+    /**
+     *  Get all companies in Hub
+     *
+     * @return Response
+     * @throws RequestException
+     */
+    public function getAllCompanies()
+    {
+        $url = vsprintf(self::ENDPOINT_FIND_BY_UUID, ['']);
+        $hubUrl = $this->hub->setToken('', true);
+        return $hubUrl->request->get($url)->throw();
     }
 
     /**
