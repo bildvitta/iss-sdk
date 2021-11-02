@@ -31,6 +31,11 @@ class UserResource extends Resource implements UserResourceContract
     private const ENDPOINT_FIND_BY_UUID = self::PREFIX . '/%s';
 
     /**
+     * @const string
+     */
+    private const ENDPOINT_GET_BY_UUIDS = self::PREFIX;
+
+    /**
      * @var Hub
      */
     private Hub $hub;
@@ -73,5 +78,29 @@ class UserResource extends Resource implements UserResourceContract
         $url = vsprintf($endpoint, [$uuid]);
 
         return $this->hub->request->get($url)->throw();
+    }
+
+    public function getByUuids(array $uuids, $attributes = [], bool $programatic = false): Response
+    {
+        $url = self::ENDPOINT_GET_BY_UUIDS;
+
+        if ($programatic) {
+            $url = $this->hub::PREFIX_PROGRAMMATIC . self::ENDPOINT_GET_BY_UUIDS;
+            $this->hub = $this->hub->setToken('', true);
+        }
+
+        $body = json_encode([
+            'uuids' => $uuids
+        ]);
+
+        $query = [];
+        if ($attributes) {
+            $query['attributes'] = $attributes;
+        }
+
+        return $this->hub->request
+            ->withBody($body, 'application/json')
+            ->get($url, $query)
+            ->throw();
     }
 }
