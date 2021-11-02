@@ -22,4 +22,8 @@ interface UserResourceContract
      * @throws RequestException
      */
     public function me(): Response;
+
+    public function findByUuid(string $uuid, bool $programatic = false): Response;
+
+    public function getByUuids(array $uuids, $attributes = [], bool $programatic = false): Response;
 }
