@@ -89,9 +89,11 @@ class UserResource extends Resource implements UserResourceContract
             $this->hub = $this->hub->setToken('', true);
         }
 
-        $body = json_encode([
-            'uuids' => $uuids
-        ]);
+        $body = [];
+        if (!empty($uuids)) {
+            $body['uuids'] = $uuids;
+        }
+        $jsonBody = json_encode($body);
 
         $query = [];
         if ($attributes) {
@@ -99,7 +101,7 @@ class UserResource extends Resource implements UserResourceContract
         }
 
         return $this->hub->request
-            ->withBody($body, 'application/json')
+            ->withBody($jsonBody, 'application/json')
             ->get($url, $query)
             ->throw();
     }
