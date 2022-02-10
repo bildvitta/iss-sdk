@@ -91,12 +91,11 @@ trait LoginUser
         foreach ($permissions as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $array) {
-                    $findPermission = Permission::findOrCreate("$key.$array", 'web');
+                    $userPermissions[] = Permission::findOrCreate("$key.$array", 'web');
                 }
             } else {
-                $findPermission = Permission::findOrCreate("$key.$value", 'web');
+                $userPermissions[] = Permission::findOrCreate("$key.$value", 'web');
             }
-            $userPermissions[] = $findPermission;
         }
 
         if (!empty($permissions)) {
