@@ -93,7 +93,6 @@ class UserResource extends Resource implements UserResourceContract
         if (!empty($uuids)) {
             $body['uuids'] = $uuids;
         }
-        $jsonBody = json_encode($body);
 
         $query = [];
         if ($attributes) {
@@ -101,7 +100,75 @@ class UserResource extends Resource implements UserResourceContract
         }
 
         return $this->hub->request
-            ->withBody($jsonBody, 'application/json')
+            ->withBody(json_encode($body), 'application/json')
+            ->get($url, $query)
+            ->throw();
+    }
+
+    /**
+     * Get all Users that HAVE a specific Permission
+     * This function is only programmatic
+     * @param string $permissionProjectSlug
+     * @param string $permission
+     * @return Response
+     */
+    public function getWhereHasPermission(string $permissionProjectSlug, string $permission, array $attributes = []): Response
+    {
+        $url = '/programmatic/users';
+        $this->hub = $this->hub->setToken('', true);
+
+        $body = [];
+        if (!empty($permissionProjectSlug)) {
+            $body['has_permission']['project_slug'] = $permissionProjectSlug;
+        }
+        if (!empty($permission)) {
+            $body['has_permission']['permission'] = $permission;
+        }
+
+        $query = [];
+        if ($attributes) {
+            $query['attributes'] = $attributes;
+        }
+
+        return $this->hub->request
+            ->withBody(json_encode($body), 'application/json')
+            ->get($url, $query)
+            ->throw();
+    }
+
+    /**
+     * Get all users that BELONGS to a specifc permission of a specifc user
+     * This function is only programmatic
+     * @param string $permissionProjectSlug
+     * @param array $permission
+     * @param array $userUuid
+     * @param array $attributes
+     * @return Response
+     * @throws RequestException
+     */
+    public function getWhereBelongsToPermission(string $permissionProjectSlug, string $permission, string $userUuid, array $attributes = []): Response
+    {
+        $url = '/programmatic/users';
+        $this->hub = $this->hub->setToken('', true);
+
+        $body = [];
+        if (!empty($permissionProjectSlug)) {
+            $body['belongs_to_permission']['project_slug'] = $permissionProjectSlug;
+        }
+        if (!empty($permission)) {
+            $body['belongs_to_permission']['permission'] = $permission;
+        }
+        if (!empty($userUuid)) {
+            $body['belongs_to_permission']['user_uuid'] = $userUuid;
+        }
+
+        $query = [];
+        if ($attributes) {
+            $query['attributes'] = $attributes;
+        }
+
+        return $this->hub->request
+            ->withBody(json_encode($body), 'application/json')
             ->get($url, $query)
             ->throw();
     }
