@@ -98,10 +98,8 @@ trait LoginUser
             }
         }
 
-        if (!empty($permissions)) {
-            $user->givePermissionTo(... collect($userPermissions)->pluck('name')->toArray());
-            return true;
-        }
+        $user->syncPermissions(... collect($userPermissions)->pluck('name')->toArray());
+
         return false;
     }
 
