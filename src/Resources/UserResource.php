@@ -172,4 +172,23 @@ class UserResource extends Resource implements UserResourceContract
             ->get($url, $query)
             ->throw();
     }
+    
+    /**
+     * @param  array  $query
+     * @param  bool  $programatic
+     *
+     * @return Response
+     * @throws RequestException
+     */
+    public function search(array $query = [], bool $programatic = false): Response
+    {
+        $url = self::PREFIX;
+
+        if ($programatic) {
+            $url = $this->hub::PREFIX_PROGRAMMATIC.$url;
+            $this->hub = $this->hub->setToken('', true);
+        }
+
+        return $this->hub->request->get($url, $query)->throw();
+    }
 }
