@@ -109,10 +109,10 @@ class UserResource extends Resource implements UserResourceContract
      * Get all Users that HAVE a specific Permission
      * This function is only programmatic
      * @param string $permissionProjectSlug
-     * @param string $permission
+     * @param mixed $permission
      * @return Response
      */
-    public function getWhereHasPermission(string $permissionProjectSlug, string $permission, array $attributes = []): Response
+    public function getWhereHasPermission(string $permissionProjectSlug, mixed $permission, array $attributes = []): Response
     {
         $url = '/programmatic/users';
         $this->hub = $this->hub->setToken('', true);
