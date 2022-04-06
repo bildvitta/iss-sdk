@@ -26,4 +26,6 @@ interface UserResourceContract
     public function findByUuid(string $uuid, bool $programatic = false): Response;
 
     public function getByUuids(array $uuids, $attributes = [], bool $programatic = false): Response;
+    
+    public function search(array $query = [], bool $programatic = false): Response;
 }
