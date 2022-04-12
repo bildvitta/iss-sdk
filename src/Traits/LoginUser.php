@@ -105,20 +105,22 @@ trait LoginUser
 
     protected function getUserCompany($user, stdClass $apiUser)
     {
-        $hubCompany = $this->getCompany($apiUser->company);
-        $companyModel = $this->app('config')->get('hub.model_company');
-        try {
-            $company = $companyModel::where('uuid', '=', $apiUser->company)->firstOrFail();
-            $company->name = $hubCompany->name;
-        } catch (ModelNotFoundException $modelNotFoundException) {
-            $company = new $companyModel();
-            $company->uuid = $hubCompany->uuid;
-            $company->name = $hubCompany->name;
-        }
+        if ($apiUser->company) {
+            $hubCompany = $this->getCompany($apiUser->company);
+            $companyModel = $this->app('config')->get('hub.model_company');
+            try {
+                $company = $companyModel::where('uuid', '=', $apiUser->company)->firstOrFail();
+                $company->name = $hubCompany->name;
+            } catch (ModelNotFoundException $modelNotFoundException) {
+                $company = new $companyModel();
+                $company->uuid = $hubCompany->uuid;
+                $company->name = $hubCompany->name;
+            }
 
-        $company->saveOrFail();
-        $user->company_id = $company->id;
-        $user->saveOrFail();
+            $company->saveOrFail();
+            $user->company_id = $company->id;
+            $user->saveOrFail();
+        }
 
         return $user;
     }
