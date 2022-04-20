@@ -24,7 +24,10 @@ trait LoginUser
                 fn () => $hubUser->user_id
             );
             $userModel = $this->app($this->app('config')->get('hub.model_user'));
-            $userModel::findOrFail($userId, ['id']);
+            $user = $userModel::findOrFail($userId, ['id']);
+
+            $apiUser = $this->getUser($bearerToken);
+            $this->updateUserPermissions($user, $apiUser);
         } catch (ModelNotFoundException $e) {
             $apiUser = $this->getUser($bearerToken);
             $user = $this->updateOrCreateUser($apiUser);
