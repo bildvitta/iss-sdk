@@ -90,6 +90,11 @@ trait LoginUser
     protected function updateUserPermissions($user, stdClass $apiUser)
     {
         $permissions = $apiUser->user_permissions;
+
+        if ($user->getAllPermissions()->count() !== collect($permissions)->flatten()->count()) {
+            $this->clearPermissionsCache();
+        }
+
         $userPermissions = [];
         foreach ($permissions as $key => $value) {
             if (is_array($value)) {
@@ -104,6 +109,12 @@ trait LoginUser
         $user->syncPermissions(... collect($userPermissions)->pluck('name')->toArray());
 
         return false;
+    }
+
+    private function clearPermissionsCache()
+    {
+        $permissionCacheKey = config('permission.cache.key');
+        Cache::forget($permissionCacheKey);
     }
 
     protected function getUserCompany($user, stdClass $apiUser)
