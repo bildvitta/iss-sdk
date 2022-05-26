@@ -15,8 +15,9 @@ class LoginController extends AuthController
     public function __invoke(LoginRequest $request)
     {
         $state = Str::random(40);
+        $stateComplement = Str::random(12);
 
-        cache()->put('state', $state, now()->addMinutes(5));
+        cache()->put("state.{$stateComplement}", $state, now()->addMinutes(5));
         cache()->put($state, $request->get('url'), now()->addMinutes(5));
 
         $query = http_build_query([
@@ -24,7 +25,7 @@ class LoginController extends AuthController
             'redirect_uri' => config('hub.oauth.redirect'),
             'response_type' => 'code',
             'scope' => config('hub.oauth.scopes'),
-            'state' => $state,
+            'state' => "{$state}.{$stateComplement}",
             'url' => $request->get('url', '/')
         ]);
 

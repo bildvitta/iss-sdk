@@ -6,6 +6,7 @@ namespace BildVitta\Hub\Http\Controllers\Auth;
 use BildVitta\Hub\Entities\HubOauthToken;
 use BildVitta\Hub\Http\Requests\CallbackRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -16,10 +17,14 @@ class CallbackController extends AuthController
 {
     public function __invoke(CallbackRequest $request)
     {
-        $state = cache()->pull('state', '');
-        $url = cache()->pull($state);
+        $stateExploded = Str::of($request->state)->explode('.');
+        $stateFromParam = $stateExploded->first();
+        $stateComplement = $stateExploded->last();
 
-        if (!(strlen($state) > 0 && $state === $request->state)) {
+        $stateFromCache = cache()->pull("state.{$stateComplement}", '');
+        $url = cache()->pull($stateFromCache);
+
+        if (!(strlen($stateFromCache) > 0 && $stateFromCache === $stateFromParam)) {
             throw new NotFoundHttpException(__('State is not valid'));
         }
 
