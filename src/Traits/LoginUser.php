@@ -27,6 +27,7 @@ trait LoginUser
             $user = $userModel::findOrFail($userId, ['id']);
 
             $apiUser = $this->getUser($bearerToken);
+            $this->getUserCompany($user, $apiUser);
             $this->updateUserPermissions($user, $apiUser);
         } catch (ModelNotFoundException $e) {
             $apiUser = $this->getUser($bearerToken);
