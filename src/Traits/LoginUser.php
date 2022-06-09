@@ -24,10 +24,10 @@ trait LoginUser
                 fn () => $hubUser->user_id
             );
             $userModel = $this->app($this->app('config')->get('hub.model_user'));
-            $user = $userModel::findOrFail($userId, ['id']);
+            $user = $userModel::findOrFail($userId, ['id', 'company_id']);
 
             $apiUser = $this->getUser($bearerToken);
-            $this->getUserCompany($user, $apiUser);
+            $this->updateUserCompany($user, $apiUser);
             $this->updateUserPermissions($user, $apiUser);
         } catch (ModelNotFoundException $e) {
             $apiUser = $this->getUser($bearerToken);
@@ -86,6 +86,24 @@ trait LoginUser
         $user = $this->getUserCompany($user, $apiUser);
 
         return $user;
+    }
+
+    protected function updateUserCompany($user, stdClass $apiUser)
+    {
+        $companyModel = $this->app('config')->get('hub.model_company');
+
+        try {
+            $company = $companyModel::select('id')->where('uuid', '=', $apiUser->company)->firstOrFail();
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            $apiCompany = $this->getCompany($apiUser->company);
+            $company = $companyModel::create([
+                'uuid' => $apiCompany->uuid,
+                'name' => $apiCompany->name,
+            ]);
+        }
+
+        $user->company_id = $company->id;
+        $user->saveOrFail();
     }
 
     protected function updateUserPermissions($user, stdClass $apiUser)
