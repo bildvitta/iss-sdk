@@ -5,6 +5,7 @@
 namespace BildVitta\Hub;
 
 use BildVitta\Hub\Console\InstallHub;
+use BildVitta\Hub\Middleware\AuthenticateCheckHubMiddleware;
 use BildVitta\Hub\Middleware\AuthenticateHubMiddleware;
 use BildVitta\Hub\Middleware\ProgrammaticMiddleware;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -52,6 +53,7 @@ class HubServiceProvider extends ServiceProvider
 
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('hub.auth', AuthenticateHubMiddleware::class);
+        $router->aliasMiddleware('hub.check', AuthenticateCheckHubMiddleware::class);
         $router->aliasMiddleware('hub.programmatic', ProgrammaticMiddleware::class);
     }
 }
