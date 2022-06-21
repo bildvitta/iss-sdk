@@ -19,7 +19,7 @@ class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
             $token = $this->setToken($request);
             $md5Token = md5($token);
 
-            if (Cache::has(md5($md5Token))) {
+            if (Cache::has($md5Token)) {
                 return $next($request);
             } else {
                 $response = $this->checkCredentials($token);
