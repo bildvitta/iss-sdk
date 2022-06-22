@@ -10,26 +10,34 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use BildVitta\Hub\Traits\LoginUser;
 
 class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
 {
+    use LoginUser;
+
     public function handle(Request $request, Closure $next)
     {
         try {
             $token = $this->setToken($request);
             $md5Token = md5($token);
 
-            if (Cache::has($md5Token)) {
-                return $next($request);
-            } else {
+            if (! Cache::has($md5Token)) {
                 $response = $this->checkCredentials($token);
-
                 if ($response->status() != Response::HTTP_OK) {
                     $this->throw(__('Unable to authenticate bearerToken.'));
                 }
 
-                Cache::put($md5Token, $md5Token, Carbon::now()->addMinutes(5));
+                Cache::put($md5Token, json_decode($response->body()), Carbon::now()->addMinutes(60));
             }
+
+            $cache = Cache::get($md5Token);
+            $user = Cache::remember($md5Token . '-user', 60*60, function() use ($cache) {
+                $userModel = $this->app('config')->get('hub.model_user');
+                return $userModel::whereHubUuid($cache->result->uuid)->first();
+            });
+
+            $this->loginByUserId($user->id);
         } catch (Exception $e) {
             Log::error($e->getMessage());
             return response()->json([
