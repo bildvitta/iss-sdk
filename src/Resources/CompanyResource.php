@@ -69,4 +69,31 @@ class CompanyResource extends Resource
 
         return $hubUrl->request->get($url)->throw();
     }
+
+    public function getByUserPermission(string $permissionProjectSlug, string $permission, string $userUuid, array $attributes = []): Response
+    {
+        $url = '/programmatic/companies';
+        $this->hub = $this->hub->setToken('', true);
+
+        $body = [];
+        if (!empty($permissionProjectSlug)) {
+            $body['user_permission']['project_slug'] = $permissionProjectSlug;
+        }
+        if (!empty($permission)) {
+            $body['user_permission']['permission'] = $permission;
+        }
+        if (!empty($userUuid)) {
+            $body['user_permission']['user_uuid'] = $userUuid;
+        }
+
+        $query = [];
+        if ($attributes) {
+            $query['attributes'] = $attributes;
+        }
+
+        return $this->hub->request
+            ->withBody(json_encode($body), 'application/json')
+            ->get($url, $query)
+            ->throw();
+    }
 }
