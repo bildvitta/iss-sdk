@@ -14,6 +14,11 @@ class AddDeletedAtColumnOnUsersTable extends Migration
                 $table->softDeletes();
             });
         }
+        if (!Schema::hasColumn($userModel->getTable(), 'is_active')) {
+            Schema::table($userModel->getTable(), function (Blueprint $table) {
+                $table->boolean('is_active')->default(false);
+            });
+        }
     }
 
     public function down()
@@ -22,6 +27,11 @@ class AddDeletedAtColumnOnUsersTable extends Migration
         if (Schema::hasColumn($userModel->getTable(), 'deleted_at')) {
             Schema::table($userModel->getTable(), function (Blueprint $table) {
                 $table->dropSoftDeletes();
+            });
+        }
+        if (!Schema::hasColumn($userModel->getTable(), 'is_active')) {
+            Schema::table($userModel->getTable(), function (Blueprint $table) {
+                $table->dropColumn('is_active');
             });
         }
     }
