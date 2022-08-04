@@ -16,7 +16,7 @@ class AddDeletedAtColumnOnUsersTable extends Migration
         }
         if (!Schema::hasColumn($userModel->getTable(), 'is_active')) {
             Schema::table($userModel->getTable(), function (Blueprint $table) {
-                $table->boolean('is_active')->default(false);
+                $table->boolean('is_active')->default(true);
             });
         }
     }
