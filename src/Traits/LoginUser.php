@@ -56,12 +56,7 @@ trait LoginUser
     {
         $userModel = $this->app('config')->get('hub.model_user');
 
-        $is_superuser = false;
-        if (property_exists($apiUser, 'is_superuser')) {
-            $is_superuser = $apiUser->is_superuser;
-        }
-
-        $user = $userModel::updateOrCreate([
+        $user = $userModel::firstOrNew([
             'hub_uuid' => $apiUser->uuid,
             'email' => $apiUser->email
         ], [
@@ -72,15 +67,17 @@ trait LoginUser
             'password' => bcrypt(uniqid(rand()))
         ]);
 
-        if ($is_superuser) {
-            $user->is_superuser = $is_superuser;
-            $user->save();
+        if (property_exists($apiUser, 'is_superuser')) {
+            $user->is_superuser = $apiUser->is_superuser;
+        } else {
+            $user->is_superuser = false;
         }
 
         if ($apiUser->uuid != $user->hub_uuid) {
             $user->hub_uuid = $apiUser->uuid;
-            $user->save();
         }
+
+        $user->save();
 
         $this->updateUserPermissions($user, $apiUser);
         $user = $this->getUserCompany($user, $apiUser);
