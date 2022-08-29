@@ -141,12 +141,12 @@ class UserResource extends Resource implements UserResourceContract
      * This function is only programmatic
      * @param string $permissionProjectSlug
      * @param array $permission
-     * @param array $userUuid
+     * @param string|array $userUuid
      * @param array $attributes
      * @return Response
      * @throws RequestException
      */
-    public function getWhereBelongsToPermission(string $permissionProjectSlug, string $permission, string $userUuid, array $attributes = []): Response
+    public function getWhereBelongsToPermission(string $permissionProjectSlug, string $permission, string|array $userUuid, array $attributes = []): Response
     {
         $url = '/programmatic/users';
         $this->hub = $this->hub->setToken('', true);
@@ -172,7 +172,7 @@ class UserResource extends Resource implements UserResourceContract
             ->get($url, $query)
             ->throw();
     }
-    
+
     /**
      * @param  array  $query
      * @param  bool  $programatic
