@@ -25,6 +25,6 @@ Route::prefix('api/users/')->middleware('hub.auth')->group(function () {
 });
 
 // Callback used to clear cached user data
-Route::prefix('api/callback')->middleware('hub.auth')->group(function () {
+Route::prefix('api/callback')->group(function () {
     Route::post('{user}/clear-cache')->name('hub.user.clear-cache')->uses(ClearCacheController::class);
 });
