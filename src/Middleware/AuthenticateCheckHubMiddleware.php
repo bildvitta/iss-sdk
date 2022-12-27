@@ -32,7 +32,7 @@ class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
             }
 
             $cache = Cache::get($md5Token);
-            $user = Cache::remember($md5Token . '-user', 60*60, function() use ($cache) {
+            $user = Cache::remember($md5Token . '-user', 60*60, function () use ($cache) {
                 $userModel = $this->app('config')->get('hub.model_user');
                 return $userModel::whereHubUuid($cache->result->uuid)->first();
             });
