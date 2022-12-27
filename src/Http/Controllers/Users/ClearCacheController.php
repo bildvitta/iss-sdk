@@ -16,7 +16,7 @@ class ClearCacheController extends UsersController
      */
     public function __invoke(MeRequest $request, $user): Response
     {
-        $user = config('hub.model_user')::findOrFail($user);
+        $user = config('hub.model_user')::where('hub_uuid', $user);
 
         // clearing user cache
         return Cache::forget('hub.me.' . $user->hub_uuid);
