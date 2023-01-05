@@ -17,7 +17,8 @@ class MeController extends UsersController
      */
     public function __invoke(MeRequest $request): Response
     {
-        return Cache::remember('hub.me.' . $request->user()->uuid, (60 * 60 * 24 * 7), function () use ($request) {
+        // 1 day cache retention
+        return Cache::remember('hub.me.' . $request->user()->hub_uuid, (60 * 60 * 24 * 1), function () use ($request) {
             return $this->getMe($request);
         });
     }
