@@ -29,6 +29,10 @@ return [
 
     'redirects' => [
         'userinfo_edit' => '/me'
-    ]
+    ],
 
+    'cache' => [
+        'ttl' => 60 * 60 * 24 * 1, // 1 day
+        'prefix' => 'hub.'
+    ]
 ];

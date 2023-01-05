@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class MeController extends UsersController
 {
@@ -17,8 +18,15 @@ class MeController extends UsersController
      */
     public function __invoke(MeRequest $request): Response
     {
-        // 1 day cache retention
-        return Cache::remember('hub.me.' . $request->user()->hub_uuid, (60 * 60 * 24 * 1), function () use ($request) {
+        Log::info([
+            'message' => 'MeController::__invoke',
+            'request' => $request->all(),
+            'Authorization' => $request->headers->get('Authorization'),
+            'user' => $request->user(),
+            'token_uri' => $this->getTokenUri()
+        ]);
+
+        return Cache::remember(config('hub.cache.prefix') . 'me.' . $request->user()->id, config('hub.cache.ttl'), function () use ($request) {
             return $this->getMe($request);
         });
     }

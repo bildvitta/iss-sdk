@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Log;
 use stdClass;
 use Str;
 
@@ -18,16 +19,30 @@ trait LoginUser
     protected function loginUserByCache(string $cacheHash, string $cacheKey, string $bearerToken): Authenticatable
     {
         try {
+            Log::info([
+                'class::function' => 'LoginUser::loginUserByCache',
+                'payload' => [
+                    'cacheHash' => $cacheHash,
+                    'cacheKey' => $cacheKey,
+                    'bearerToken' => $bearerToken
+                ]
+            ]);
+
             $hubUser = HubUser::whereToken($cacheHash)->firstOrFail();
+
             $userId = Cache::rememberForever(
                 $cacheKey,
                 fn () => $hubUser->user_id
             );
-            $userModel = $this->app($this->app('config')->get('hub.model_user'));
-            $user = $userModel::findOrFail($userId, ['id', 'company_id']);
 
+            $userModelClass = $this->app($this->app('config')->get('hub.model_user'));
+            $user = $userModelClass::findOrFail($userId, ['id', 'company_id']);
+
+            // Creates GET request to /me (Hub API)
             $apiUser = $this->getUser($bearerToken);
+
             $this->updateUserCompany($user, $apiUser);
+
             $this->updateUserPermissions($user, $apiUser);
         } catch (ModelNotFoundException $e) {
             $apiUser = $this->getUser($bearerToken);
@@ -48,6 +63,7 @@ trait LoginUser
      */
     protected function getUser(string $bearerToken): stdClass
     {
+        // get user from Hub (GET request /me)
         $response = $this->app('hub', [$bearerToken])->users()->me();
         return $response->object()->result;
     }
@@ -122,7 +138,7 @@ trait LoginUser
             }
         }
 
-        $user->syncPermissions(... collect($userPermissions)->pluck('name')->toArray());
+        $user->syncPermissions(...collect($userPermissions)->pluck('name')->toArray());
 
         return false;
     }
