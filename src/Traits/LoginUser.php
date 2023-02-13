@@ -156,6 +156,8 @@ trait LoginUser
         
         $user->syncPermissions(... collect($userPermissions)->pluck('name')->toArray());
         
+        $user->refresh();
+
         Log::info(json_encode([
             'class' => 'Trait::LoginUser::updateUserPermissions',
             'action' => 'AfterSyncPermissions',
