@@ -110,7 +110,7 @@ trait LoginUser
             'class' => 'Trait::LoginUser::updateUserPermissions',
             'action' => 'function_init',
             'data' => [
-                'local_user_uuid' => $user->hub_uuid,
+                'local_user_id' => $user->id,
                 'api_user_uuid' => $apiUser->uuid
             ]
         ]));
@@ -119,11 +119,12 @@ trait LoginUser
 
         if ($user->getAllPermissions()->count() !== collect($permissions)->flatten()->count()) {
             $this->clearPermissionsCache();
+            
             Log::info(json_encode([
                 'class' => 'Trait::LoginUser::updateUserPermissions',
                 'action' => 'inside_clear_cache_check',
                 'data' => [
-                    'local_user_uuid' => $user->hub_uuid,
+                    'local_user_id' => $user->id,
                     'api_user_uuid' => $apiUser->uuid
                 ]
             ]));
@@ -143,16 +144,29 @@ trait LoginUser
 
         Log::info(json_encode([
             'class' => 'Trait::LoginUser::updateUserPermissions',
-            'action' => 'syncPermissions',
+            'action' => 'beforeSyncPermissions',
             'data' => [
                 'sent_to_sync' => collect($userPermissions)->pluck('name')->toArray(),
                 'api_user_permissions' => $apiUser->user_permissions,
-                'local_user_uuid' => $user->hub_uuid,
-                'api_user_uuid' => $apiUser->uuid
+                'local_user_id' => $user->id,
+                'api_user_uuid' => $apiUser->uuid,
+                'local_permissions_before_sync' => $user->getAllPermissions()->pluck('name')->toArray(),
             ],
         ]));
-
+        
         $user->syncPermissions(... collect($userPermissions)->pluck('name')->toArray());
+        
+        Log::info(json_encode([
+            'class' => 'Trait::LoginUser::updateUserPermissions',
+            'action' => 'AfterSyncPermissions',
+            'data' => [
+                'sent_to_sync' => collect($userPermissions)->pluck('name')->toArray(),
+                'api_user_permissions' => $apiUser->user_permissions,
+                'local_user_id' => $user->id,
+                'api_user_uuid' => $apiUser->uuid,
+                'local_permissions_after_sync' => $user->getAllPermissions()->pluck('name')->toArray(),
+            ],
+        ]));
 
         return false;
     }
