@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Log;
 use stdClass;
 use Str;
 
@@ -105,13 +106,25 @@ trait LoginUser
 
     protected function updateUserPermissions($user, stdClass $apiUser)
     {
+        Log::info([
+            'class' => 'Trait::LoginUser::updateUserPermissions',
+            'local_user' => $user,
+            'api_user' => $apiUser
+        ]);
+
         $permissions = $apiUser->user_permissions;
 
         if ($user->getAllPermissions()->count() !== collect($permissions)->flatten()->count()) {
             $this->clearPermissionsCache();
+            Log::info([
+                'class' => 'Trait::LoginUser::updateUserPermissions',
+                'inside_loop' => '$user->getAllPermissions()->count() !== collect($permissions)->flatten()->count()',
+                'action' => 'clearPermissionsCache'
+            ]);
         }
 
         $userPermissions = [];
+
         foreach ($permissions as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $array) {
@@ -121,6 +134,12 @@ trait LoginUser
                 $userPermissions[] = Permission::findOrCreate("$key.$value", 'web');
             }
         }
+
+        Log::info([
+            'class' => 'Trait::LoginUser::updateUserPermissions',
+            'userPermissions_after_loop' => $userPermissions,
+            'sent_to_syncPermissions' => collect($userPermissions)->pluck('name')->toArray(),
+        ]);
 
         $user->syncPermissions(... collect($userPermissions)->pluck('name')->toArray());
 
