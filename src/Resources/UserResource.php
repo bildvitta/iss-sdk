@@ -125,7 +125,10 @@ class UserResource extends Resource implements UserResourceContract
             $body['has_permission']['permission'] = $permission;
         }
 
-        $query = [];
+        $query = [
+            'limit' => 999999,
+            'offset' => 0,
+        ];
         if ($attributes) {
             $query['attributes'] = $attributes;
         }
@@ -162,7 +165,10 @@ class UserResource extends Resource implements UserResourceContract
             $body['belongs_to_permission']['user_uuid'] = $userUuid;
         }
 
-        $query = [];
+        $query = [
+            'limit' => 999999,
+            'offset' => 0,
+        ];
         if ($attributes) {
             $query['attributes'] = $attributes;
         }
