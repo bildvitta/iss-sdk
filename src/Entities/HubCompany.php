@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class HubCompany extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'hub_companies';
 
     protected $fillable = [
