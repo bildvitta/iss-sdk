@@ -6,6 +6,7 @@ use BildVitta\Hub\Http\Controllers\Auth\LogoutController;
 use BildVitta\Hub\Http\Controllers\Auth\RefreshController;
 use BildVitta\Hub\Http\Controllers\Users\MeController;
 use BildVitta\Hub\Http\Controllers\Users\MeEditController;
+use BildVitta\Hub\Http\Controllers\Users\MePatchController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/auth')->middleware(['throttle'])->group(function () {
@@ -20,5 +21,6 @@ Route::prefix('api/auth')->middleware(['throttle'])->group(function () {
 
 Route::prefix('api/users/')->middleware('hub.auth')->group(function () {
     Route::get('me')->name('hub.users.me')->uses(MeController::class);
+    Route::patch('me')->name('hub.users.me.patch')->uses(MePatchController::class);
     Route::get('me/edit')->name('hub.users.edit')->uses(MeEditController::class);
 });
