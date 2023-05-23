@@ -110,9 +110,10 @@ class UserResource extends Resource implements UserResourceContract
      * This function is only programmatic
      * @param string $permissionProjectSlug
      * @param mixed $permission
+     * @param array $query
      * @return Response
      */
-    public function getWhereHasPermission(string $permissionProjectSlug, mixed $permission, array $attributes = []): Response
+    public function getWhereHasPermission(string $permissionProjectSlug, mixed $permission, array $query = []): Response
     {
         $url = '/programmatic/users';
         $this->hub = $this->hub->setToken('', true);
@@ -125,13 +126,10 @@ class UserResource extends Resource implements UserResourceContract
             $body['has_permission']['permission'] = $permission;
         }
 
-        $query = [
+        $query = array_merge([
             'limit' => 999999,
             'offset' => 0,
-        ];
-        if ($attributes) {
-            $query['attributes'] = $attributes;
-        }
+        ], $query);
 
         return $this->hub->request
             ->withBody(json_encode($body), 'application/json')
@@ -149,7 +147,7 @@ class UserResource extends Resource implements UserResourceContract
      * @return Response
      * @throws RequestException
      */
-    public function getWhereBelongsToPermission(string $permissionProjectSlug, string $permission, string|array $userUuid, array $attributes = []): Response
+    public function getWhereBelongsToPermission(string $permissionProjectSlug, string $permission, string|array $userUuid, array $query = []): Response
     {
         $url = '/programmatic/users';
         $this->hub = $this->hub->setToken('', true);
@@ -165,13 +163,10 @@ class UserResource extends Resource implements UserResourceContract
             $body['belongs_to_permission']['user_uuid'] = $userUuid;
         }
 
-        $query = [
+        $query = array_merge([
             'limit' => 999999,
             'offset' => 0,
-        ];
-        if ($attributes) {
-            $query['attributes'] = $attributes;
-        }
+        ], $query);
 
         return $this->hub->request
             ->withBody(json_encode($body), 'application/json')
