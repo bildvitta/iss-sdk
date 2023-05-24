@@ -106,15 +106,15 @@ trait LoginUser
 
     protected function updateUserPermissions($user, stdClass $apiUser)
     {
-        $user_permissions = $apiUser->user_permissions;
+        $userPermissions = $apiUser->user_permissions;
 
-        if ($user->getAllPermissions()->count() !== collect($user_permissions)->flatten()->count()) {
+        if ($user->getAllPermissions()->count() !== collect($userPermissions)->flatten()->count()) {
             $this->clearPermissionsCache();
         }
 
         $permissionsArray = [];
 
-        foreach ($user_permissions as $key => $value) {
+        foreach ($userPermissions as $key => $value) {
             if (!is_array($value)) {
                 $permissionsArray[] = "$key.$value";
                 continue;
