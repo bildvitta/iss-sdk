@@ -134,7 +134,9 @@ trait LoginUser
             $permissionsInsert[] = ['name' => $permission, 'guard_name' => 'web'];
         }
 
-        Permission::insert($permissionsInsert);
+        if (!empty($permissionsInsert)) {
+            Permission::insert($permissionsInsert);
+        }
 
         $user->syncPermissions(...collect($permissionsArray)->pluck('name')->toArray());
 
