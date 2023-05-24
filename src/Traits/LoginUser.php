@@ -106,26 +106,38 @@ trait LoginUser
 
     protected function updateUserPermissions($user, stdClass $apiUser)
     {
-        $permissions = $apiUser->user_permissions;
+        $user_permissions = $apiUser->user_permissions;
 
-        if ($user->getAllPermissions()->count() !== collect($permissions)->flatten()->count()) {
+        if ($user->getAllPermissions()->count() !== collect($user_permissions)->flatten()->count()) {
             $this->clearPermissionsCache();
         }
 
-        $userPermissions = [];
+        $permissionsArray = [];
 
-        foreach ($permissions as $key => $value) {
-            if (is_array($value)) {
-                foreach ($value as $array) {
-                    $userPermissions[] = Permission::findOrCreate("$key.$array", 'web');
-                }
-            } else {
-                $userPermissions[] = Permission::findOrCreate("$key.$value", 'web');
+        foreach ($user_permissions as $key => $value) {
+            if (!is_array($value)) {
+                $permissionsArray[] = "$key.$value";
+                continue;
+            }
+            foreach ($value as $array) {
+                $permissionsArray[] = "$key.$array";
             }
         }
-        
-        $user->syncPermissions(... collect($userPermissions)->pluck('name')->toArray());
-        
+
+        $localPermissions = Permission::toBase()->whereIn('name', $permissionsArray)
+            ->orderBy('name')->get('name')->pluck('name')->toArray();
+
+        $permissionsDiff = array_diff($permissionsArray, $localPermissions);
+        $permissionsInsert = [];
+
+        foreach ($permissionsDiff as $permission) {
+            $permissionsInsert[] = ['name' => $permission, 'guard_name' => 'web'];
+        }
+
+        Permission::insert($permissionsInsert);
+
+        $user->syncPermissions(...collect($permissionsArray)->pluck('name')->toArray());
+
         $user->refresh();
 
         return false;
