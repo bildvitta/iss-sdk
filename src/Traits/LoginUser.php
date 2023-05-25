@@ -112,17 +112,7 @@ trait LoginUser
             $this->clearPermissionsCache();
         }
 
-        $permissionsArray = [];
-
-        foreach ($userPermissions as $key => $value) {
-            if (!is_array($value)) {
-                $permissionsArray[] = "$key.$value";
-                continue;
-            }
-            foreach ($value as $array) {
-                $permissionsArray[] = "$key.$array";
-            }
-        }
+        $permissionsArray = $this->userPermissionsToArray($userPermissions);
 
         $localPermissions = Permission::toBase()->whereIn('name', $permissionsArray)
             ->orderBy('name')->get('name')->pluck('name')->toArray();
@@ -143,6 +133,21 @@ trait LoginUser
         $user->refresh();
 
         return false;
+    }
+
+    private function userPermissionsToArray($userPermissions): array
+    {
+        $permissionsArray = [];
+        foreach ($userPermissions as $key => $value) {
+            if (!is_array($value)) {
+                $permissionsArray[] = "$key.$value";
+                continue;
+            }
+            foreach ($value as $array) {
+                $permissionsArray[] = "$key.$array";
+            }
+        }
+        return $permissionsArray;
     }
 
     private function clearPermissionsCache()
