@@ -18,7 +18,7 @@
     }
   ],
   "require": {
-    "php": "^7.4|^8.0",
+    "php": "^7.4|^8.0|^8.1",
     "illuminate/cache": "^7.0|^8.49|^9.0",
     "illuminate/config": "^7.0|^8.50|^9.0",
     "illuminate/contracts": "^7.0|^8.0|^9.0",
@@ -30,7 +30,7 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0",
-    "phpunit/phpunit": "10.0.x-dev"
+    "phpunit/phpunit": "^10.0"
   },
   "autoload": {
     "psr-4": {
