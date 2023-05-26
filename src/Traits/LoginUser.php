@@ -128,7 +128,7 @@ trait LoginUser
             Permission::insert($permissionsInsert);
         }
 
-        $user->syncPermissions(...collect($permissionsArray)->pluck('name')->toArray());
+        $user->syncPermissions(...collect($permissionsArray)->toArray());
 
         $user->refresh();
 
