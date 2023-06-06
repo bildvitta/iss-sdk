@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\Log;
 use stdClass;
 use Str;
 
@@ -101,7 +100,10 @@ trait LoginUser
         }
 
         $user->company_id = $company->id;
-        $user->saveOrFail();
+
+        if ($user->isDirty()) {
+            $user->saveOrFail();
+        }
     }
 
     protected function updateUserPermissions($user, stdClass $apiUser)
@@ -128,9 +130,10 @@ trait LoginUser
             Permission::insert($permissionsInsert);
         }
 
-        $user->syncPermissions(...collect($permissionsArray)->pluck('name')->toArray());
-
-        $user->refresh();
+        if (!empty($permissionsDiff)) {
+            $user->syncPermissions(...collect($permissionsArray)->toArray());
+            $user->refresh();
+        }
 
         return false;
     }
