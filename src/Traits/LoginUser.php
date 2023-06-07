@@ -130,7 +130,9 @@ trait LoginUser
             Permission::insert($permissionsInsert);
         }
 
-        if (!empty($permissionsDiff)) {
+        $userPermissionsDiff = array_diff($permissionsArray, $user->permissions->pluck('name')->toArray());
+
+        if (!empty($userPermissionsDiff)) {
             $user->syncPermissions(...collect($permissionsArray)->toArray());
             $user->refresh();
         }
