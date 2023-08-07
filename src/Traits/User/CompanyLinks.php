@@ -2,10 +2,12 @@
 
 
 namespace BildVitta\Hub\Traits\User;
+
 use BildVitta\Hub\Entities\UserCompany;
+use App\Models\Company;
 
 trait CompanyLinks
-{    
+{
     public function user_companies()
     {
         return $this->hasMany(UserCompany::class, 'user_id', 'id');
@@ -18,8 +20,9 @@ trait CompanyLinks
 
     public function company_links()
     {
+        $userCompany = app(config('hub.model_company'));
         return $this->hasManyThrough(
-            \App\Models\Company::class,
+            $userCompany,
             UserCompany::class,
             'user_id',
             'id',

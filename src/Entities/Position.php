@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Models\Role;
 
 /**
  * App\Models\Position
@@ -56,8 +57,8 @@ class Position extends Model
     ];
 
     public function roles()
-    { 
-        return $this->hasMany(\App\Models\Role::class, 'position_id', 'id');
+    {
+        return $this->hasMany(Role::class, 'position_id', 'id');
     }
 
     public function parent_position(): BelongsTo
