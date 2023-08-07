@@ -15,4 +15,9 @@ class HubCompany extends Model
         'uuid',
         'name'
     ];
+
+    public function main_company()
+    {
+        return $this->belongsTo(HubCompany::class, 'main_company_id', 'id');
+    }
 }
