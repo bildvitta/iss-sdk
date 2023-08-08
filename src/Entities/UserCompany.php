@@ -91,8 +91,6 @@ class UserCompany extends Model
         'has_specific_permissions' => 'boolean',
     ];
 
-    protected $guard_name = 'api';
-
     public function companyName(): Attribute
     {
         return Attribute::get(function () {

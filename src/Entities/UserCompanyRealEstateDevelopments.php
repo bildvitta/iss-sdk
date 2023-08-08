@@ -33,4 +33,9 @@ class UserCompanyRealEstateDevelopments extends Model
         'user_company_id',
         'real_estate_development_uuid',
     ];
+
+    public function user_company()
+    {
+        return $this->belongsTo(UserCompany::class, 'user_company_id', 'id');
+    }
 }
