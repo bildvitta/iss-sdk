@@ -2,25 +2,18 @@
 
 namespace BildVitta\Hub\Services;
 
-use App\Models\Company;
 use BildVitta\Hub\Entities\Position;
 use App\Models\User;
 use BildVitta\Hub\Entities\UserCompanyParentPosition;
-use Cache;
+use BildVitta\Hub\Entities\UserCompany;
 
 class UserCompanyService
 {
     private static $userChildrens = [];
+    private static $userParents = [];
 
-    public static function getUsersByParentId($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false)
+    public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false)
     {
-        $allBelowCache = $allBelow ? 'all-bellow-true' : 'all-bellow-false';
-        $cacheKey = "team-{$companyUuid}-{$parentUserUuid}-{$positionUuid}-{$allBelowCache}";
-
-        if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
-        }
-
         $parentUser = User::with('user_companies')
             ->where('uuid', $parentUserUuid)->first();
 
@@ -34,7 +27,8 @@ class UserCompanyService
             return collect([]);
         }
 
-        $company = Company::where('uuid', $companyUuid)->first();
+        $modelCompany = app(config('hub.model_company'));
+        $company = $modelCompany::where('uuid', $companyUuid)->first();
 
         if (! $company) {
             return collect([]);
@@ -60,10 +54,9 @@ class UserCompanyService
             self::getAllUserChildrens($userCompanyParents);
         }
 
-        return Cache::remember($cacheKey, now()->addHour(), function () {
-            return User::whereIn('id', self::$userChildrens)
-                ->get(['uuid', 'name']);
-        });
+        return User::whereIn('id', self::$userChildrens)
+            ->get(['uuid', 'name']);
+        
     }
 
     private static function getUserChildrens($userCompanyParents)
@@ -100,5 +93,86 @@ class UserCompanyService
         if (count($childrensParents)) {
             self::getAllUserChildrens($childrensParents);
         }
+    }
+
+    public static function getAllParentsByUserUuid($userUuid, $companyUuid, $onlyTop = false)
+    {
+        $user = User::with('user_companies')
+            ->where('uuid', $userUuid)->first();
+
+        if (! $user) {
+            return collect([]);
+        }
+
+        $modelCompany = app(config('hub.model_company'));
+        $company = $modelCompany::where('uuid', $companyUuid)->first();
+
+        if (! $company) {
+            return collect([]);
+        }
+
+        $userCompanyChildren = $user->user_companies
+            ->where('company_id', $company->id)
+            ->first()
+            ->user_company_children()
+            ->first();
+        
+        if(! $userCompanyChildren) {
+            return collect([]);
+        }
+        
+        self::getAllUserParentsByUserCompanyChildren($userCompanyChildren);
+
+        if($onlyTop) {
+            $topUserId = end(self::$userParents);
+            self::$userParents = [];
+            self::$userParents[] = $topUserId;
+        }
+
+        return User::whereIn('id', self::$userParents)
+            ->get(['uuid', 'name']);
+        
+    }
+
+    private static function getAllUserParentsByUserCompanyChildren($userCompanyChildren)
+    {
+        $userCompanyParent = $userCompanyChildren->user_company_parent()
+                            ->first();
+
+        self::$userParents[] = $userCompanyParent->user()->first()->id;
+
+        $userCompanyChildren = $userCompanyParent->user_company_children()
+                            ->first();
+        
+        if($userCompanyChildren) {
+            self::getAllUserParentsByUserCompanyChildren($userCompanyChildren);
+        }
+
+    }
+
+    public static function getAllTopParentUsersByCompanyUuid($companyUuid)
+    {
+        $modelCompany = app(config('hub.model_company'));
+        $company = $modelCompany::where('uuid', $companyUuid)->first();
+
+        if (! $company) {
+            return collect([]);
+        }
+
+        $userCompany = UserCompany::doesntHave('user_company_children')
+                        ->with('user')
+                        ->where('company_id', $company->id)
+                        ->get();
+
+        $users = collect([]);
+
+        $userCompany->each(function ($item) use ($users) {
+            $users[] = [
+                'uuid' => $item->user->uuid,
+                'name' => $item->user->name
+            ];
+        });
+
+        return $users;
     }
 }

@@ -4,7 +4,6 @@
 namespace BildVitta\Hub\Traits\User;
 
 use BildVitta\Hub\Entities\UserCompany;
-use App\Models\Company;
 
 trait CompanyLinks
 {

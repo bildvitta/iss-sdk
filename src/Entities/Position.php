@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * App\Models\Position
@@ -48,6 +48,7 @@ class Position extends Model
     use HasFactory;
     use SoftDeletes;
     use HasUuid;
+    use HasRoles;
 
     protected $fillable = [
         'uuid',
@@ -55,11 +56,6 @@ class Position extends Model
         'parent_position_id',
         'company_id',
     ];
-
-    public function roles()
-    {
-        return $this->hasMany(Role::class, 'position_id', 'id');
-    }
 
     public function parent_position(): BelongsTo
     {
