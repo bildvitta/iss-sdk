@@ -12,7 +12,12 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('user_companies', function (Blueprint $table) {
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userModel = app(config('hub.model_user'));
+        $positionModel = app(config('hub.model_position'));
+        $companyModel = app(config('hub.model_company'));
+
+        Schema::create($userCompanyModel->getTable(), function (Blueprint $table) use ($userModel, $positionModel, $companyModel) {
             $table->id();
             $table->uuid();
             $table->unsignedBigInteger('user_id');
@@ -22,9 +27,9 @@ return new class extends Migration {
             $table->boolean('has_all_real_estate_developments')->default(false);
             $table->boolean('has_specific_permissions')->default(false);
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('position_id')->references('id')->on('positions')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on($userModel->getTable())->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on($companyModel->getTable())->onDelete('cascade');
+            $table->foreign('position_id')->references('id')->on($positionModel->getTable())->onDelete('cascade');
             $table->softDeletes();
         });
     }
@@ -36,6 +41,7 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('user_companies');
+        $userCompanyModel = app(config('hub.model_user_company'));
+        Schema::dropIfExists($userCompanyModel->getTable());
     }
 };

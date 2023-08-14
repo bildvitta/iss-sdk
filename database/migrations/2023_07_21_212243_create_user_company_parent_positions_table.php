@@ -12,12 +12,15 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('user_company_parent_positions', function (Blueprint $table) {
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+
+        Schema::create($userCompanyParentPositionModel->getTable(), function (Blueprint $table) use ($userCompanyModel) {
             $table->id();
             $table->unsignedBigInteger('user_company_id');
             $table->unsignedBigInteger('user_company_parent_id');
-            $table->foreign('user_company_id')->references('id')->on('user_companies')->onDelete('cascade');
-            $table->foreign('user_company_parent_id')->references('id')->on('user_companies')->onDelete('cascade');
+            $table->foreign('user_company_id')->references('id')->on($userCompanyModel->getTable())->onDelete('cascade');
+            $table->foreign('user_company_parent_id')->references('id')->on($userCompanyModel->getTable())->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +33,7 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('user_company_parent_positions');
+        $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+        Schema::dropIfExists($userCompanyParentPositionModel->getTable());
     }
 };

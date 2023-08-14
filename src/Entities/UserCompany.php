@@ -2,8 +2,7 @@
 
 namespace BildVitta\Hub\Entities;
 
-use App\Services\UserCompanyService;
-use App\Traits\HasUuid;
+use BildVitta\Hub\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,61 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Traits\HasRoles;
 
-/**
- * App\Models\UserCompany
- *
- * @property int $id
- * @property string $uuid
- * @property int $user_id
- * @property int $company_id
- * @property int|null $position_id
- * @property bool $is_seller
- * @property bool $has_all_real_estate_developments
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $has_specific_permissions
- * @property-read \Illuminate\Database\Eloquent\Collection<int, UserCompany> $children_positions
- * @property-read int|null $children_positions_count
- * @property-read \App\Models\Company $company
- * @property-read \Illuminate\Database\Eloquent\Collection<int, UserCompany> $parent_positions
- * @property-read int|null $parent_positions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
- * @property-read int|null $permissions_count
- * @property-read \App\Models\Position|null $position
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserCompanyRealEstateDevelopments> $real_estate_developments
- * @property-read int|null $real_estate_developments_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
- * @property-read int|null $roles_count
- * @property-read \App\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserCompanyParentPosition> $user_company_children
- * @property-read int|null $user_company_children_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserCompanyParentPosition> $user_company_parent
- * @property-read int|null $user_company_parent_count
- *
- * @method static \Database\Factories\UserCompanyFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany permission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany query()
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany role($roles, $guard = null)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereCompanyId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereHasAllRealEstateDevelopments($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereHasSpecificPermissions($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereIsSeller($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany wherePositionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany whereUuid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|UserCompany withoutTrashed()
- *
- * @mixin \Eloquent
- */
 class UserCompany extends Model
 {
     use HasFactory;
@@ -73,7 +17,7 @@ class UserCompany extends Model
     use HasUuid;
     use HasRoles;
 
-    protected $table = 'user_companies';
+    protected $table = 'hub_user_companies';
 
     protected $fillable = [
         'uuid',
