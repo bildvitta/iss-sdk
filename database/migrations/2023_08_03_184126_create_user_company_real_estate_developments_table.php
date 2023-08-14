@@ -12,11 +12,14 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('user_company_real_estate_developments', function (Blueprint $table) {
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_developments'));
+
+        Schema::create($userCompanyRealEstateDevelopmentsModel->getTable(), function (Blueprint $table) use ($userCompanyModel) {
             $table->id();
             $table->unsignedBigInteger('user_company_id');
             $table->uuid('real_estate_development_uuid');
-            $table->foreign('user_company_id')->references('id')->on('user_companies')->onDelete('cascade');
+            $table->foreign('user_company_id')->references('id')->on($userCompanyModel->getTable())->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +31,7 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('user_company_real_estate_developments');
+        $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_developments'));
+        Schema::dropIfExists($userCompanyRealEstateDevelopmentsModel->getTable());
     }
 };

@@ -12,14 +12,16 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('positions', function (Blueprint $table) {
+        $positionModel = app(config('hub.model_position'));
+        $companyModel = app(config('hub.model_company'));
+        Schema::create($positionModel->getTable(), function (Blueprint $table) use ($positionModel, $companyModel) {
             $table->id();
             $table->string('name');
             $table->unsignedBigInteger('parent_position_id')->nullable();
             $table->uuid('uuid')->unique();
             $table->unsignedBigInteger('company_id')->after('uuid')->default('1');
-            $table->foreign('company_id')->references('id')->on('companies')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('parent_position_id')->references('id')->on('positions')->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on($companyModel->getTable())->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('parent_position_id')->references('id')->on($positionModel->getTable())->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +34,7 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('positions');
+        $positionModel = app(config('hub.model_position'));
+        Schema::dropIfExists($positionModel->getTable());
     }
 };
