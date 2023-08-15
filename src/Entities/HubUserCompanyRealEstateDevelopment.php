@@ -5,7 +5,7 @@ namespace BildVitta\Hub\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserCompanyRealEstateDevelopments extends Model
+class HubUserCompanyRealEstateDevelopment extends Model
 {
     use HasFactory;
 
@@ -18,6 +18,7 @@ class UserCompanyRealEstateDevelopments extends Model
 
     public function user_company()
     {
-        return $this->belongsTo(UserCompany::class, 'user_company_id', 'id');
+        $userCompanyModel = app(config('hub.model_user_company'));
+        return $this->belongsTo($userCompanyModel, 'user_company_id', 'id');
     }
 }

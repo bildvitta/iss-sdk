@@ -2,11 +2,6 @@
 
 namespace BildVitta\Hub\Services;
 
-use BildVitta\Hub\Entities\Position;
-use App\Models\User;
-use BildVitta\Hub\Entities\UserCompanyParentPosition;
-use BildVitta\Hub\Entities\UserCompany;
-
 class UserCompanyService
 {
     private static $userChildrens = [];
@@ -14,21 +9,23 @@ class UserCompanyService
 
     public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false)
     {
-        $parentUser = User::with('user_companies')
+        $userModel = app(config('hub.model_user'));
+        $parentUser = $userModel::with('user_companies')
             ->where('uuid', $parentUserUuid)->first();
 
         if (! $parentUser) {
             return collect([]);
         }
 
-        $position = Position::where('uuid', $positionUuid)->first();
+        $positionModel = app(config('hub.model_position'));
+        $position = $positionModel::where('uuid', $positionUuid)->first();
 
         if (! $position) {
             return collect([]);
         }
 
-        $modelCompany = app(config('hub.model_company'));
-        $company = $modelCompany::where('uuid', $companyUuid)->first();
+        $companyModel = app(config('hub.model_company'));
+        $company = $companyModel::where('uuid', $companyUuid)->first();
 
         if (! $company) {
             return collect([]);
@@ -54,7 +51,7 @@ class UserCompanyService
             self::getAllUserChildrens($userCompanyParents);
         }
 
-        return User::whereIn('id', self::$userChildrens)
+        return $userModel::whereIn('id', self::$userChildrens)
             ->get(['uuid', 'name']);
         
     }
@@ -83,7 +80,8 @@ class UserCompanyService
 
             self::$userChildrens[] = $userCompanyChildren->user_id;
 
-            $userChildrenIsParent = UserCompanyParentPosition::isParent($userCompanyChildren->id);
+            $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+            $userChildrenIsParent = $userCompanyParentPositionModel::isParent($userCompanyChildren->id);
 
             if ($userChildrenIsParent) {
                 $childrensParents[] = $userChildrenIsParent;
@@ -97,15 +95,16 @@ class UserCompanyService
 
     public static function getAllParentsByUserUuid($userUuid, $companyUuid, $onlyTop = false)
     {
-        $user = User::with('user_companies')
+        $userModel = app(config('hub.model_user'));
+        $user = $userModel::with('user_companies')
             ->where('uuid', $userUuid)->first();
 
         if (! $user) {
             return collect([]);
         }
 
-        $modelCompany = app(config('hub.model_company'));
-        $company = $modelCompany::where('uuid', $companyUuid)->first();
+        $companyModel = app(config('hub.model_company'));
+        $company = $companyModel::where('uuid', $companyUuid)->first();
 
         if (! $company) {
             return collect([]);
@@ -129,7 +128,7 @@ class UserCompanyService
             self::$userParents[] = $topUserId;
         }
 
-        return User::whereIn('id', self::$userParents)
+        return $userModel::whereIn('id', self::$userParents)
             ->get(['uuid', 'name']);
         
     }
@@ -152,14 +151,15 @@ class UserCompanyService
 
     public static function getAllTopParentUsersByCompanyUuid($companyUuid)
     {
-        $modelCompany = app(config('hub.model_company'));
-        $company = $modelCompany::where('uuid', $companyUuid)->first();
+        $companyModel = app(config('hub.model_company'));
+        $company = $companyModel::where('uuid', $companyUuid)->first();
 
         if (! $company) {
             return collect([]);
         }
 
-        $userCompany = UserCompany::doesntHave('user_company_children')
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userCompany = $userCompanyModel::doesntHave('user_company_children')
                         ->with('user')
                         ->where('company_id', $company->id)
                         ->get();

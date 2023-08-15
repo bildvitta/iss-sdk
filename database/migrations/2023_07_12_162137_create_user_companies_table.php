@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('position_id')->nullable();
-            $table->boolean('is_seller')->after('position_id')->default(false);
+            $table->boolean('is_seller')->default(false);
             $table->boolean('has_all_real_estate_developments')->default(false);
             $table->boolean('has_specific_permissions')->default(false);
             $table->timestamps();
