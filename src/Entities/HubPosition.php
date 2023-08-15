@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Traits\HasRoles;
 
-class Position extends Model
+class HubPosition extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -27,11 +27,13 @@ class Position extends Model
 
     public function parent_position(): BelongsTo
     {
-        return $this->belongsTo(Position::class, 'parent_position_id', 'id');
+        $positionModel = app(config('hub.model_position'));
+        return $this->belongsTo($positionModel, 'parent_position_id', 'id');
     }
 
     public function user_companies()
     {
-        return $this->hasMany(UserCompany::class, 'position_id', 'id');
+        $userCompanyModel = app(config('hub.model_user_company'));
+        return $this->hasMany($userCompanyModel, 'position_id', 'id');
     }
 }

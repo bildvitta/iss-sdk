@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Traits\HasRoles;
 
-class UserCompany extends Model
+class HubUserCompany extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -50,29 +50,35 @@ class UserCompany extends Model
 
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class, 'company_id', 'id');
+        $companyModel = app(config('hub.model_company'));
+        return $this->belongsTo($companyModel, 'company_id', 'id');
     }
 
     public function position(): BelongsTo
     {
-        return $this->belongsTo(Position::class, 'position_id', 'id');
+        $positionModel = app(config('hub.model_position'));
+        return $this->belongsTo($positionModel, 'position_id', 'id');
     }
 
     public function user_company_parent()
     {
-        return $this->hasMany(UserCompanyParentPosition::class, 'user_company_parent_id', 'id');
+        $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+        return $this->hasMany($userCompanyParentPositionModel, 'user_company_parent_id', 'id');
     }
 
     public function user_company_children()
     {
-        return $this->hasMany(UserCompanyParentPosition::class, 'user_company_id', 'id');
+        $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+        return $this->hasMany($userCompanyParentPositionModel, 'user_company_id', 'id');
     }
 
     public function children_positions()
     {
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
         return $this->hasManyThrough(
-            UserCompany::class,
-            UserCompanyParentPosition::class,
+            $userCompanyModel,
+            $userCompanyParentPositionModel,
             'user_company_parent_id',
             'id',
             'id',
@@ -82,9 +88,11 @@ class UserCompany extends Model
 
     public function parent_positions()
     {
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
         return $this->hasManyThrough(
-            UserCompany::class,
-            UserCompanyParentPosition::class,
+            $userCompanyModel,
+            $userCompanyParentPositionModel,
             'user_company_id',
             'id',
             'id',
@@ -94,6 +102,7 @@ class UserCompany extends Model
 
     public function real_estate_developments()
     {
-        return $this->hasMany(UserCompanyRealEstateDevelopments::class, 'user_company_id', 'id');
+        $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_developments'));
+        return $this->hasMany($userCompanyRealEstateDevelopmentsModel, 'user_company_id', 'id');
     }
 }
