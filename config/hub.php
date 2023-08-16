@@ -10,10 +10,10 @@ return [
     'model_user' => \App\Models\User::class,
 
     'model_company' => \BildVitta\Hub\Entities\HubCompany::class,
-    'model_position' => \BildVitta\Hub\Entities\Position::class,
-    'model_user_company' => \BildVitta\Hub\Entities\UserCompany::class,
-    'model_user_company_parent_position' => \BildVitta\Hub\Entities\UserCompanyParentPosition::class,
-    'model_user_company_real_estate_developments' => \BildVitta\Hub\Entities\UserCompanyRealEstateDevelopments::class,
+    'model_position' => \BildVitta\Hub\Entities\HubPosition::class,
+    'model_user_company' => \BildVitta\Hub\Entities\HubUserCompany::class,
+    'model_user_company_parent_position' => \BildVitta\Hub\Entities\HubUserCompanyParentPosition::class,
+    'model_user_company_real_estate_development' => \BildVitta\Hub\Entities\HubUserCompanyRealEstateDevelopment::class,
 
     'programatic_access' => [
         'client_id' => env('HUB_PROGRAMMATIC_CLIENT'),
