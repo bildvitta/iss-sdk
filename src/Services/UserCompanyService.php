@@ -128,8 +128,7 @@ class UserCompanyService
             self::$userParents[] = $topUserId;
         }
 
-        return $userModel::whereIn('id', self::$userParents)
-            ->get(['uuid', 'name']);
+        return collect(self::$userParents);
         
     }
 
@@ -138,7 +137,11 @@ class UserCompanyService
         $userCompanyParent = $userCompanyChildren->user_company_parent()
                             ->first();
 
-        self::$userParents[] = $userCompanyParent->user()->first()->id;
+        self::$userParents[$userCompanyParent->position->uuid] = [
+            'uuid' => $userCompanyParent->user->uuid,
+            'name' => $userCompanyParent->user->name,
+            'positionUuid' => $userCompanyParent->position->uuid,
+        ];
 
         $userCompanyChildren = $userCompanyParent->user_company_children()
                             ->first();
