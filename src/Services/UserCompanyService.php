@@ -128,7 +128,7 @@ class UserCompanyService
             self::$userParents[] = $topUserId;
         }
 
-        return collect(self::$userParents);
+        return collect(self::$userParents)->sort();
         
     }
 
@@ -137,11 +137,7 @@ class UserCompanyService
         $userCompanyParent = $userCompanyChildren->user_company_parent()
                             ->first();
 
-        self::$userParents[$userCompanyParent->position->uuid] = [
-            'uuid' => $userCompanyParent->user->uuid,
-            'name' => $userCompanyParent->user->name,
-            'positionUuid' => $userCompanyParent->position->uuid,
-        ];
+        self::$userParents[] = $userCompanyParent;
 
         $userCompanyChildren = $userCompanyParent->user_company_children()
                             ->first();
