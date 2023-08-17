@@ -174,37 +174,4 @@ class UserCompanyService
 
         return $users;
     }
-
-    public static function getPositionsByOrder($companyUuid, $order = 0)
-    {
-        $positionModel = app(config('hub.model_position'));
-        $companyModel = app(config('hub.model_company'));
-        $userCompanyModel = app(config('hub.model_user_company'));
-
-        $company = $companyModel::whereUuid($companyUuid)->first();
-
-        if (! $company) {
-            return [];
-        }
-
-        $companyId = $company->main_company_id ?? $company->id;
-
-        $positions = $positionModel->where('company_id', $companyId)->get()->toArray();
-
-        if(! $positions) {
-            return [];
-        }
-
-        if(! array_key_exists($order, $positions)) {            
-            return [];
-        }
-
-        $position = $positions[$order];
-
-        return $userCompanyModel->with(['user', 'position', 'company'])
-                ->where('company_id', $companyId)                
-                ->where('position_id', $position['id'])
-                ->get()
-                ->toArray();
-    }
 }
