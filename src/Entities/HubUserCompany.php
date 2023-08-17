@@ -2,7 +2,6 @@
 
 namespace BildVitta\Hub\Entities;
 
-use BildVitta\Hub\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +13,6 @@ class HubUserCompany extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    use HasUuid;
     use HasRoles;
 
     protected $table = 'hub_user_companies';

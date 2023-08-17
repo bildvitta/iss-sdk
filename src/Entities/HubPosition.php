@@ -2,7 +2,6 @@
 
 namespace BildVitta\Hub\Entities;
 
-use BildVitta\Hub\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +12,6 @@ class HubPosition extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    use HasUuid;
     use HasRoles;
 
     protected $table = 'hub_positions';
