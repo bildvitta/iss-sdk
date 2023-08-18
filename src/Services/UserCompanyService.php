@@ -215,7 +215,7 @@ class UserCompanyService
         $position = self::$positions[$order];
 
         return $userCompanyModel->with(['user', 'position', 'company'])
-                ->where('company_id', $companyId)
+                ->where('company_id', $company->id)
                 ->where('position_id', $position['id'])
                 ->get()
                 ->toArray();
