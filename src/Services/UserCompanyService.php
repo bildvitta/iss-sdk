@@ -10,6 +10,9 @@ class UserCompanyService
 
     public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false)
     {
+        self::$userChildrens = [];
+        self::$userParents = [];
+        
         $userModel = app(config('hub.model_user'));
         $parentUser = $userModel::with('user_companies')
             ->where('uuid', $parentUserUuid)->first();
@@ -181,6 +184,8 @@ class UserCompanyService
 
     public static function getPositionsByOrder($companyUuid, $order = 0)
     {
+        self::$positions = [];
+        
         $positionModel = app(config('hub.model_position'));
         $companyModel = app(config('hub.model_company'));
         $userCompanyModel = app(config('hub.model_user_company'));
@@ -203,14 +208,14 @@ class UserCompanyService
 
         self::sortPositions($positions);
 
-        if(! array_key_exists($order, $positions)) {            
+        if(! array_key_exists($order, $positions)) {
             return [];
         }
 
         $position = self::$positions[$order];
 
         return $userCompanyModel->with(['user', 'position', 'company'])
-                ->where('company_id', $companyId)                
+                ->where('company_id', $companyId)
                 ->where('position_id', $position['id'])
                 ->get()
                 ->toArray();
@@ -233,7 +238,7 @@ class UserCompanyService
             $lastPosition = end(self::$positions);
             if($position['parent_position_id'] == $lastPosition['id']) {
                 self::$positions[] = $position;
-                unset($positions[$key]);                
+                unset($positions[$key]);
             }
         }
 
