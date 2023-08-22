@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up()
     {
         $userCompanyModel = app(config('hub.model_user_company'));
-        $userCompanyRealEstateDevelopmentModel = app(config('hub.model_user_company_real_estate_developments'));
+        $userCompanyRealEstateDevelopmentModel = app(config('hub.model_user_company_real_estate_development'));
 
         Schema::create($userCompanyRealEstateDevelopmentModel->getTable(), function (Blueprint $table) use ($userCompanyModel) {
             $table->id();
@@ -34,7 +34,7 @@ return new class extends Migration {
      */
     public function down()
     {
-        $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_developments'));
+        $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_development'));
         Schema::dropIfExists($userCompanyRealEstateDevelopmentsModel->getTable());
     }
 };

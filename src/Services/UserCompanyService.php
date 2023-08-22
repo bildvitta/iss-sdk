@@ -10,64 +10,75 @@ class UserCompanyService
 
     public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false)
     {
-        self::$userChildrens = [];
-        self::$userParents = [];
-        
-        $userModel = app(config('hub.model_user'));
-        $parentUser = $userModel::with('user_companies')
-            ->where('uuid', $parentUserUuid)->first();
+        try {
+            self::$userChildrens = [];
+            self::$userParents = [];
+            
+            $userModel = app(config('hub.model_user'));
+            $parentUser = $userModel::with('user_companies')
+                ->where('uuid', $parentUserUuid)->first();
 
-        if (! $parentUser) {
+            if (! $parentUser) {
+                return collect([]);
+            }
+
+            $positionModel = app(config('hub.model_position'));
+            $position = $positionModel::where('uuid', $positionUuid)->first();
+
+            if (! $position) {
+                return collect([]);
+            }
+
+            $companyModel = app(config('hub.model_company'));
+            $company = $companyModel::where('uuid', $companyUuid)->first();
+
+            if (! $company) {
+                return collect([]);
+            }
+
+            $userCompany = $parentUser->user_companies()
+                ->with('user_company_parent')
+                ->where('company_id', $company->id)
+                ->where('position_id', $position->id)
+                ->first();
+
+            if (! $userCompany) {
+                return collect([]);
+            }
+
+            $userCompanyParents = $userCompany->user_company_parent()->get();
+
+            if (! $allBelow) {
+                self::getUserChildrens($userCompanyParents);
+            }
+
+            if ($allBelow) {
+                self::getAllUserChildrens($userCompanyParents);
+            }
+
+            return $userModel::whereIn('id', self::$userChildrens)
+                ->get(['uuid', 'name']);
+
+        } catch(\Exception $e) {
+            report($e);
             return collect([]);
         }
-
-        $positionModel = app(config('hub.model_position'));
-        $position = $positionModel::where('uuid', $positionUuid)->first();
-
-        if (! $position) {
-            return collect([]);
-        }
-
-        $companyModel = app(config('hub.model_company'));
-        $company = $companyModel::where('uuid', $companyUuid)->first();
-
-        if (! $company) {
-            return collect([]);
-        }
-
-        $userCompany = $parentUser->user_companies()
-            ->with('user_company_parent')
-            ->where('company_id', $company->id)
-            ->where('position_id', $position->id)
-            ->first();
-
-        if (! $userCompany) {
-            return collect([]);
-        }
-
-        $userCompanyParents = $userCompany->user_company_parent()->get();
-
-        if (! $allBelow) {
-            self::getUserChildrens($userCompanyParents);
-        }
-
-        if ($allBelow) {
-            self::getAllUserChildrens($userCompanyParents);
-        }
-
-        return $userModel::whereIn('id', self::$userChildrens)
-            ->get(['uuid', 'name']);
         
     }
 
     private static function getUserChildrens($userCompanyParents)
     {
         foreach ($userCompanyParents as $userCompanyParent) {
-            self::$userChildrens[] = $userCompanyParent
+            $userCompanyChildren = $userCompanyParent
                 ->user_company_children()
                 ->select('user_id')
-                ->first()
-                ->user_id;
+                ->first();
+
+            if(! $userCompanyChildren) {
+                throw new \Exception('Falha ao buscar usuários de cargo filho!');
+            }
+
+            self::$userChildrens[] = $userCompanyChildren->user_id;
         }
     }
 
@@ -81,6 +92,10 @@ class UserCompanyService
                 ->user_company_children()
                 ->select('id', 'user_id')
                 ->first();
+
+            if(! $userCompanyChildren) {
+                throw new \Exception('Falha ao buscar todos os usuários de cargo filho!');
+            }
 
             self::$userChildrens[] = $userCompanyChildren->user_id;
 
@@ -99,43 +114,48 @@ class UserCompanyService
 
     public static function getAllParentsByUserUuid($userUuid, $companyUuid, $onlyTop = false)
     {
-        self::$userChildrens = [];
-        self::$userParents = [];
-
-        $userModel = app(config('hub.model_user'));
-        $user = $userModel::with('user_companies')
-            ->where('uuid', $userUuid)->first();
-
-        if (! $user) {
-            return collect([]);
-        }
-
-        $companyModel = app(config('hub.model_company'));
-        $company = $companyModel::where('uuid', $companyUuid)->first();
-
-        if (! $company) {
-            return collect([]);
-        }
-
-        $userCompanyChildren = $user->user_companies
-            ->where('company_id', $company->id)
-            ->first()
-            ->user_company_children()
-            ->first();
-        
-        if(! $userCompanyChildren) {
-            return collect([]);
-        }
-        
-        self::getAllUserParentsByUserCompanyChildren($userCompanyChildren);
-
-        if($onlyTop) {
-            $topUserId = end(self::$userParents);
+        try {
+            self::$userChildrens = [];
             self::$userParents = [];
-            self::$userParents[] = $topUserId;
-        }
 
-        return collect(self::$userParents)->reverse();
+            $userModel = app(config('hub.model_user'));
+            $user = $userModel::with('user_companies')
+                ->where('uuid', $userUuid)->first();
+
+            if (! $user) {
+                return collect([]);
+            }
+
+            $companyModel = app(config('hub.model_company'));
+            $company = $companyModel::where('uuid', $companyUuid)->first();
+
+            if (! $company) {
+                return collect([]);
+            }
+
+            $userCompanyChildren = $user->user_companies
+                ->where('company_id', $company->id)
+                ->first()
+                ->user_company_children()
+                ->first();
+            
+            if(! $userCompanyChildren) {
+                return collect([]);
+            }
+            
+            self::getAllUserParentsByUserCompanyChildren($userCompanyChildren);
+
+            if($onlyTop) {
+                $topUserId = end(self::$userParents);
+                self::$userParents = [];
+                self::$userParents[] = $topUserId;
+            }
+
+            return collect(self::$userParents)->reverse();
+        } catch(\Exception $e) {
+            report($e);
+            return collect([]);
+        }       
         
     }
 
@@ -143,6 +163,10 @@ class UserCompanyService
     {
         $userCompanyParent = $userCompanyChildren->user_company_parent()
                             ->first();
+
+        if(! $userCompanyParent) {
+            throw new \Exception('Falha ao buscar todos os usuários de cargo pai!');
+        }
 
         self::$userParents[] = $userCompanyParent;
 

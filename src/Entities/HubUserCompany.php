@@ -61,13 +61,13 @@ class HubUserCompany extends Model
     public function user_company_parent()
     {
         $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
-        return $this->hasMany($userCompanyParentPositionModel, 'user_company_parent_id', 'id');
+        return $this->hasOne($userCompanyParentPositionModel, 'user_company_parent_id', 'id');
     }
 
     public function user_company_children()
     {
         $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
-        return $this->hasMany($userCompanyParentPositionModel, 'user_company_id', 'id');
+        return $this->hasOne($userCompanyParentPositionModel, 'user_company_id', 'id');
     }
 
     public function children_positions()
@@ -100,7 +100,7 @@ class HubUserCompany extends Model
 
     public function real_estate_developments()
     {
-        $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_developments'));
+        $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_development'));
         return $this->hasMany($userCompanyRealEstateDevelopmentsModel, 'user_company_id', 'id');
     }
 }
