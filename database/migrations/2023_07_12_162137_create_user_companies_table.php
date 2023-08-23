@@ -19,7 +19,7 @@ return new class extends Migration {
 
         Schema::create($userCompanyModel->getTable(), function (Blueprint $table) use ($userModel, $positionModel, $companyModel) {
             $table->id();
-            $table->uuid();
+            $table->uuid('uuid');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('position_id')->nullable();
