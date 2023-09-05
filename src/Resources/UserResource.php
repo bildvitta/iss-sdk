@@ -60,7 +60,8 @@ class UserResource extends Resource implements UserResourceContract
     public function me(): Response
     {
         $params = [
-            'project' => Config::get('app.slug', '')
+            'project' => Config::get('app.slug', ''),
+            'programmatic' => true,
         ];
         $endpoint = self::ENDPOINT_ME . '?' . http_build_query($params);
         return $this->hub->request->get($endpoint)->throw();
@@ -186,7 +187,7 @@ class UserResource extends Resource implements UserResourceContract
         $url = self::PREFIX;
 
         if ($programatic) {
-            $url = $this->hub::PREFIX_PROGRAMMATIC.$url;
+            $url = $this->hub::PREFIX_PROGRAMMATIC . $url;
             $this->hub = $this->hub->setToken('', true);
         }
 

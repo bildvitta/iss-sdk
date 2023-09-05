@@ -65,6 +65,24 @@ MS_HUB_BASE_URI="https://api-dev-hub.nave.dev"
 MS_HUB_PREFIX="/api"
 ```
 
+## Add Trait on User Model
+
+And remember to add the `BildVitta\Hub\Traits\User\HasCompanyLinks` Trait in the Users model.
+
+```php
+// \App\Models\User
+
+use BildVitta\Hub\Traits\User\HasCompanyLinks;
+
+class User extends Authenticatable
+{
+    use HasCompanyLinks;
+    ...
+}
+```
+
+Remembering that this trait already has `Spatie\Permission\Traits\HasRoles` by default, so you can remove the `Spatie\Permission\Traits\HasRoles` trait from your user model.
+
 # Usage
 
 All requests made to the ISS Service will return an instance

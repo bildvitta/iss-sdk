@@ -17,13 +17,12 @@ return new class extends Migration {
         Schema::create($positionModel->getTable(), function (Blueprint $table) use ($positionModel, $companyModel) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('parent_position_id')->nullable();
             $table->uuid('uuid')->unique();
-            $table->unsignedBigInteger('company_id')->default('1');
-            $table->foreign('company_id')->references('id')->on($companyModel->getTable())->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('parent_position_id')->references('id')->on($positionModel->getTable())->onDelete('cascade');
+            $table->foreignId('company_id')->constrained($companyModel->getTable())->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('parent_position_id')->nullable()->constrained($positionModel->getTable())->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
+            $table->unique(['name', 'company_id']);
         });
     }
 

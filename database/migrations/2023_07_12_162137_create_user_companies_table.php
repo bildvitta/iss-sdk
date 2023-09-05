@@ -19,17 +19,15 @@ return new class extends Migration {
 
         Schema::create($userCompanyModel->getTable(), function (Blueprint $table) use ($userModel, $positionModel, $companyModel) {
             $table->id();
-            $table->uuid('uuid');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('position_id')->nullable();
+            $table->uuid();
+            $table->foreignId('user_id')->constrained($userModel->getTable())->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained($positionModel->getTable())->cascadeOnDelete();
+            $table->foreignId('position_id')->nullable()->constrained($companyModel->getTable())->cascadeOnDelete();
             $table->boolean('is_seller')->default(false);
             $table->boolean('has_all_real_estate_developments')->default(false);
             $table->boolean('has_specific_permissions')->default(false);
+            $table->boolean('is_post_construction')->default(false);
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on($userModel->getTable())->onDelete('cascade');
-            $table->foreign('company_id')->references('id')->on($companyModel->getTable())->onDelete('cascade');
-            $table->foreign('position_id')->references('id')->on($positionModel->getTable())->onDelete('cascade');
             $table->softDeletes();
         });
     }
