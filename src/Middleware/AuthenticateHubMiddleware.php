@@ -13,7 +13,6 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class AuthenticateHubMiddleware
@@ -45,7 +44,6 @@ class AuthenticateHubMiddleware extends AuthenticateHubHelpers
 
             $user = $this->loginUserByCache($cacheHash, $cacheKey, $token);
         } catch (Exception $e) {
-            Log::error($e->getMessage());
             report($e);
             return response()->json([
                 'status' => [
