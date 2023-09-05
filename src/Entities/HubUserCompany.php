@@ -17,6 +17,8 @@ class HubUserCompany extends Model
 
     protected $table = 'hub_user_companies';
 
+    protected $guard_name = 'web';
+
     protected $fillable = [
         'uuid',
         'user_id',
