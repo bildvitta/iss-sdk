@@ -17,10 +17,8 @@ return new class extends Migration {
 
         Schema::create($userCompanyParentPositionModel->getTable(), function (Blueprint $table) use ($userCompanyModel) {
             $table->id();
-            $table->unsignedBigInteger('user_company_id');
-            $table->unsignedBigInteger('user_company_parent_id');
-            $table->foreign('user_company_id')->references('id')->on($userCompanyModel->getTable())->onDelete('cascade');
-            $table->foreign('user_company_parent_id')->references('id')->on($userCompanyModel->getTable())->onDelete('cascade');
+            $table->foreignId('user_company_id')->constrained($userCompanyModel->getTable())->cascadeOnDelete();
+            $table->foreignId('user_company_parent_id')->constrained($userCompanyModel->getTable())->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });
