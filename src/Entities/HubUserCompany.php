@@ -23,12 +23,14 @@ class HubUserCompany extends Model
         'company_id',
         'position_id',
         'is_seller',
+        'is_post_construction',
         'has_all_real_estate_developments',
         'has_specific_permissions',
     ];
 
     protected $casts = [
         'is_seller' => 'boolean',
+        'is_post_construction' => 'boolean',
         'has_all_real_estate_developments' => 'boolean',
         'has_specific_permissions' => 'boolean',
     ];
