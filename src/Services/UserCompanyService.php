@@ -282,6 +282,34 @@ class UserCompanyService
         });
     }
 
+    public function getSortedPositions($companyUuid)
+    {
+        self::$positions = [];
+        
+        $positionModel = app(config("hub.model_position"));
+        $companyModel = app(config("hub.model_company"));
+
+        $company = $companyModel::whereUuid($companyUuid)->first();
+
+        if (!$company) {
+            return [];
+        }
+
+        $companyId = $company->main_company_id ?? $company->id;
+
+        $positions = $positionModel->where("company_id", $companyId)
+            ->get()
+            ->toArray();
+
+        if (!$positions) {
+            return [];
+        }
+
+        self::sortPositions($positions);
+
+        return self::$positions;
+    }
+
     private static function sortPositions($positions)
     {
         if (!count($positions)) {
