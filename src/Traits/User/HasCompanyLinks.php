@@ -4,10 +4,10 @@
 namespace BildVitta\Hub\Traits\User;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Traits\HasRoles;
 
 trait HasCompanyLinks
