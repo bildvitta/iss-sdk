@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('name');
             $table->uuid('uuid')->unique();
             $table->foreignId('company_id')->constrained($companyModel->getTable())->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('parent_position_id')->constrained($positionModel->getTable())->cascadeOnDelete();
+            $table->foreignId('parent_position_id')->nullable()->constrained($positionModel->getTable())->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
             $table->unique(['name', 'company_id']);
