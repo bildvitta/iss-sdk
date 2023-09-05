@@ -17,7 +17,7 @@ return new class extends Migration {
 
         Schema::create($userCompanyRealEstateDevelopmentModel->getTable(), function (Blueprint $table) use ($userCompanyModel) {
             $table->id();
-            $table->foreignId('user_company_id')->constrained($userCompanyModel->getTable())->cascadeOnDelete()->index('hucred_user_company_id_foreign');
+            $table->foreignId('user_company_id')->constrained($userCompanyModel->getTable())->cascadeOnDelete()->index('hub_user_real_estate_developments_user_company_id_foreign');
             $table->uuid('real_estate_development_uuid');
             $table->timestamps();
         });
