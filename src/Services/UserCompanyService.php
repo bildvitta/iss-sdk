@@ -71,7 +71,7 @@ class UserCompanyService
 
             return Cache::tags(["UserCompanyService", "User-$parentUserUuid"])->remember($cacheKey, now()->addHour(), function () use ($userModel) {
                 return $userModel::whereIn("id", self::$userChildrens)
-                    ->get(["uuid", "name"]);
+                    ->get(["uuid", "name", "is_active"]);
             });
         } catch (\Exception $e) {
             report($e);
