@@ -21,8 +21,8 @@ return new class extends Migration {
             $table->id();
             $table->uuid();
             $table->foreignId('user_id')->constrained($userModel->getTable())->cascadeOnDelete();
-            $table->foreignId('company_id')->constrained($positionModel->getTable())->cascadeOnDelete();
-            $table->foreignId('position_id')->nullable()->constrained($companyModel->getTable())->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained($companyModel->getTable())->cascadeOnDelete();
+            $table->foreignId('position_id')->nullable()->constrained($positionModel->getTable())->cascadeOnDelete();
             $table->boolean('is_seller')->default(false);
             $table->boolean('has_all_real_estate_developments')->default(false);
             $table->boolean('has_specific_permissions')->default(false);
