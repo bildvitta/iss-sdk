@@ -59,7 +59,7 @@ trait HasCompanyLinks
     public function realEstateDevelopments(): Attribute
     {
         return Attribute::get(function () {
-            return $this->user_company?->realEstateDevelopments ?? collect([]);
+            return $this->user_company?->real_estate_developments ?? collect([]);
         });
     }
 }
