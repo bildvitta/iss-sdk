@@ -19,7 +19,7 @@ return new class extends Migration {
 
         Schema::create($userCompanyModel->getTable(), function (Blueprint $table) use ($userModel, $positionModel, $companyModel) {
             $table->id();
-            $table->uuid();
+            $table->uuid('uuid');
             $table->foreignId('user_id')->constrained($userModel->getTable())->cascadeOnDelete();
             $table->foreignId('company_id')->constrained($companyModel->getTable())->cascadeOnDelete();
             $table->foreignId('position_id')->nullable()->constrained($positionModel->getTable())->cascadeOnDelete();
