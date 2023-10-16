@@ -97,7 +97,7 @@ class UserCompanyService
 
     private static function getAllUserChildrens($userCompanyParents)
     {
-        $childrensParents = [];
+        $childrensParents = collect([]);
 
         foreach ($userCompanyParents as $userCompanyParent) {
 
@@ -112,11 +112,10 @@ class UserCompanyService
 
             self::$userChildrens[] = $userCompanyChildren->user_id;
 
-            $userCompanyParentPositionModel = app(config("hub.model_user_company_parent_position"));
-            $userChildrenIsParent = $userCompanyParentPositionModel::isParent($userCompanyChildren->id);
+            $userChildrenIsParent = $userCompanyChildren->user_company_parent()->get();
 
-            if ($userChildrenIsParent) {
-                $childrensParents[] = $userChildrenIsParent;
+            if (count($userChildrenIsParent)) {
+                $childrensParents = $childrensParents->merge($userChildrenIsParent);
             }
         }
 
