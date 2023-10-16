@@ -147,11 +147,11 @@ trait LoginUser
         $permissionsArray = [];
         foreach ($userPermissions as $key => $value) {
             if (!is_array($value)) {
-                $permissionsArray[] = "$key.$value";
+                $permissionsArray[] = "$key";
                 continue;
             }
             foreach ($value as $array) {
-                $permissionsArray[] = "$key.$array";
+                $permissionsArray[] = "$key";
             }
         }
         return $permissionsArray;
