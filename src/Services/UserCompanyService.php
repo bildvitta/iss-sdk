@@ -201,7 +201,7 @@ class UserCompanyService
      * Get users by companyUuid and positionUuid
      * 
      * @param string $companyUuid
-     * @param string $positionUuid
+     * @param int $positionOrder 0|1|2
      * @param array $filter
      * @param array $attributes
      *
@@ -231,14 +231,18 @@ class UserCompanyService
         $userModel = app(config("hub.model_user"));
         $tableUser = $userModel->getTable();
         $tableUserCompany = $userCompanyModel->getTable();
-        $attributes = collect($attributes)->map(function($item) use($tableUser) {
-            return $tableUser . '.' . $item;
-        });
+
+        if($attributes && count($attributes)) {
+            $attributes = collect($attributes)->map(function($item) use($tableUser) {
+                return $tableUser . '.' . $item;
+            });
+        }
 
         $users = $userModel::join($tableUserCompany, "{$tableUserCompany}.user_id", "{$tableUser}.id")
             ->where("{$tableUserCompany}.company_id", $company->id)
             ->where("{$tableUserCompany}.position_id", $position['id'])
-            ->select($attributes->toArray());
+            ->select($attributes->toArray())
+            ->orderBy('name');
 
         if(count($filter)) {
             foreach($filter as $key=>$value) {
