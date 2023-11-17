@@ -337,26 +337,23 @@ class UserCompanyService
 
         $userCompanyModel = app(config("hub.model_user_company"));
         $userModel = app(config("hub.model_user"));
-        $positionModel = app(config("hub.model_position"));
         $companyModel = app(config("hub.model_company"));
         $tableUser = $userModel->getTable();
         $tableUserCompany = $userCompanyModel->getTable();
-        $tablePosition = $positionModel->getTable();
         $tableCompany = $companyModel->getTable();
         
         $userCompany = $userCompanyModel::join($tableUser, "{$tableUserCompany}.user_id", "{$tableUser}.id")
-            ->join($tablePosition, "{$tablePosition}.id", "{$tableUserCompany}.position_id")
             ->join($tableCompany, "{$tableCompany}.id", "{$tableUserCompany}.company_id")
             ->where("{$tableCompany}.uuid", $companyUuid)
             ->where("{$tableUser}.uuid", $userUuid)
-            ->select(["{$tablePosition}.id"])
+            ->select(["{$tableUserCompany}.position_id"])
             ->first();
 
         if(!$userCompany) {
             return false;
         }
 
-        return $userCompany->toArray()['id'] == $position['id'];
+        return $userCompany->toArray()['position_id'] == $position['id'];
 
     }
 }
