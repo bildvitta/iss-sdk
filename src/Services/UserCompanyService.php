@@ -38,9 +38,11 @@ class UserCompanyService
                 return Cache::tags(["UserCompanyService", "User-$parentUserUuid"])->get($cacheKey);
             }
 
+            $modelUserKey = config("hub.model_user_key");
+
             $userModel = app(config("hub.model_user"));
             $parentUser = $userModel::with("user_companies")
-                ->where("uuid", $parentUserUuid)->first();
+                ->where($modelUserKey, $parentUserUuid)->first();
 
             if (!$parentUser) {
                 return collect([]);
@@ -347,11 +349,12 @@ class UserCompanyService
         $tableUser = $userModel->getTable();
         $tableUserCompany = $userCompanyModel->getTable();
         $tableCompany = $companyModel->getTable();
+        $modelUserKey = config("hub.model_user_key");
         
         $userCompany = $userCompanyModel::join($tableUser, "{$tableUserCompany}.user_id", "{$tableUser}.id")
             ->join($tableCompany, "{$tableCompany}.id", "{$tableUserCompany}.company_id")
             ->where("{$tableCompany}.uuid", $companyUuid)
-            ->where("{$tableUser}.uuid", $userUuid)
+            ->where("{$tableUser}.{$modelUserKey}", $userUuid)
             ->select(["{$tableUserCompany}.position_id"])
             ->first();
 

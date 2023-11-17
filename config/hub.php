@@ -8,7 +8,7 @@ return [
     'prefix' => env('MS_HUB_API_PREFIX', '/api'),
 
     'model_user' => \App\Models\User::class,
-
+    'model_user_key' => 'uuid',
     'model_company' => \BildVitta\Hub\Entities\HubCompany::class,
     'model_position' => \BildVitta\Hub\Entities\HubPosition::class,
     'model_user_company' => \BildVitta\Hub\Entities\HubUserCompany::class,
