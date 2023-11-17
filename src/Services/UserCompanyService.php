@@ -219,7 +219,7 @@ class UserCompanyService
      */
     public static function getUsersByCompanyUuidAndPositionOrder($companyUuid, $positionOrder, $filter = ['is_active' => 1], $attributes = ['uuid', 'name', 'is_active'])
     {
-        $cacheKey = "UCS-UsersByCompanyUuidAndPositionOrder-{$companyUuid}-{$positionOrder}-" . "filter-" . implode("-", $filter) . "-attributes-" . implode("-", $attributes);
+        $cacheKey = "UCS-UsersByCompanyUuidAndPositionOrder-{$companyUuid}-{$positionOrder}-filter-" . implode("-", $filter) . "-attributes-" . implode("-", $attributes);
 
         if (Cache::tags(["UserCompanyService", "Company-$companyUuid"])->has($cacheKey)) {
             return Cache::tags(["UserCompanyService", "Company-$companyUuid"])->get($cacheKey);
@@ -333,6 +333,12 @@ class UserCompanyService
      */
     public static function checkPositionUser($companyUuid, $userUuid, $positionOrder)
     {
+        $cacheKey = "UCS-CheckPositionUser-{$companyUuid}-{$userUuid}-{$positionOrder}";
+
+        if (Cache::tags(["UserCompanyService", "User-$userUuid"])->has($cacheKey)) {
+            return Cache::tags(["UserCompanyService", "User-$userUuid"])->get($cacheKey);
+        }
+
         $position = self::getSortedPositions($companyUuid)[$positionOrder];
 
         $userCompanyModel = app(config("hub.model_user_company"));
@@ -353,7 +359,9 @@ class UserCompanyService
             return false;
         }
 
-        return $userCompany->toArray()['position_id'] == $position['id'];
+        return Cache::tags(["UserCompanyService", "User-$companyUuid"])->remember($cacheKey, now()->addHour(), function () use ($userCompany, $position) {
+            return $userCompany->toArray()['position_id'] == $position['id'];
+        });        
 
     }
 }
