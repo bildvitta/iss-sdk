@@ -22,13 +22,14 @@ class UserCompanyService
      * @param string $parentUserUuid
      * @param string $companyUuid
      * @param boolean $allBelow
+     * @param int $onlyPositionOrder null|0|1|2
      * @param array $attributes
      * @return User
      * 
      */
-    public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false, $attributes = ["uuid", "name", "is_active"])
+    public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false, $onlyPositionOrder = null, $attributes = ["uuid", "name", "is_active"])
     {
-        $cacheKey = "UCS-UsersByParentUuid-$parentUserUuid-$positionUuid-$companyUuid-" . ($allBelow ? "true" : "false") . "-" . implode("-", $attributes);
+        $cacheKey = "UCS-UsersByParentUuid-$parentUserUuid-$positionUuid-$companyUuid-" . ($allBelow ? "true" : "false") . ($onlyPositionOrder !== null ? '-' . $onlyPositionOrder : '') . "-" . implode("-", $attributes);
 
         try {
             self::$userChildrens = [];
@@ -79,7 +80,7 @@ class UserCompanyService
             }
 
             if ($allBelow) {
-                self::getAllUserChildrens($userCompanyParents);
+                self::getAllUserChildrens($userCompanyParents, $companyUuid, $onlyPositionOrder);
             }
 
             return Cache::tags(["UserCompanyService", "User-$parentUserUuid"])->remember($cacheKey, now()->addHour(), function () use ($userModel, $attributes) {
@@ -108,22 +109,30 @@ class UserCompanyService
         }
     }
 
-    private static function getAllUserChildrens($userCompanyParents)
+    private static function getAllUserChildrens($userCompanyParents, $companyUuid, $onlyPositionOrder)
     {
         $childrensParents = collect([]);
+
+        $position = null;
+
+        if($onlyPositionOrder !== null) {
+            $position = self::getSortedPositions($companyUuid)[$onlyPositionOrder];
+        }
 
         foreach ($userCompanyParents as $userCompanyParent) {
 
             $userCompanyChildren = $userCompanyParent
                 ->user_company_children()
-                ->select("id", "user_id")
+                ->select("id", "user_id", "position_id")
                 ->first();
 
             if (!$userCompanyChildren) {
                 throw new \Exception("Falha ao buscar todos os usuários de cargo filho!");
             }
 
-            self::$userChildrens[] = $userCompanyChildren->user_id;
+            if($onlyPositionOrder === null || $userCompanyChildren->position_id && $position['id'] == $userCompanyChildren->position_id) {
+                self::$userChildrens[] = $userCompanyChildren->user_id;
+            }            
 
             $userChildrenIsParent = $userCompanyChildren->user_company_parent()->get();
 
@@ -133,7 +142,7 @@ class UserCompanyService
         }
 
         if (count($childrensParents)) {
-            self::getAllUserChildrens($childrensParents);
+            self::getAllUserChildrens($childrensParents, $companyUuid, $onlyPositionOrder);
         }
     }
 
