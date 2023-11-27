@@ -162,8 +162,9 @@ class UserCompanyService
             }
 
             $userModel = app(config("hub.model_user"));
+            $modelUserKey = config("hub.model_user_key");
             $user = $userModel::with("user_companies")
-                ->where("uuid", $userUuid)->first();
+                ->where($modelUserKey, $userUuid)->first();
 
             if (!$user) {
                 return collect([]);
@@ -406,8 +407,9 @@ class UserCompanyService
             }
 
             $userModel = app(config("hub.model_user"));
+            $modelUserKey = config("hub.model_user_key");
             $user = $userModel::with("user_companies")
-                ->where("uuid", $userUuid)->first();
+                ->where($modelUserKey, $userUuid)->first();
 
             if (!$user) {
                 return collect([]);
@@ -466,8 +468,9 @@ class UserCompanyService
             }
 
             $userModel = app(config("hub.model_user"));
+            $modelUserKey = config("hub.model_user_key");
             $user = $userModel::with("user_companies")
-                ->where("uuid", $userUuid)->first();
+                ->where($modelUserKey, $userUuid)->first();
 
             if (!$user) {
                 return collect([]);
