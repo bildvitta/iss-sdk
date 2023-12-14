@@ -1,6 +1,5 @@
 <?php
 
-
 namespace BildVitta\Hub\Traits\User;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -17,6 +16,7 @@ trait HasCompanyLinks
     public function user_company(): HasOne
     {
         $userCompanyModel = app(config('hub.model_user_company'));
+
         return $this->hasOne($userCompanyModel, 'user_id', 'id')
             ->where('company_id', $this->company_id);
     }
@@ -24,6 +24,7 @@ trait HasCompanyLinks
     public function user_companies(): HasMany
     {
         $userCompanyModel = app(config('hub.model_user_company'));
+
         return $this->hasMany($userCompanyModel, 'user_id', 'id');
     }
 
@@ -36,6 +37,7 @@ trait HasCompanyLinks
     {
         $userCompany = app(config('hub.model_company'));
         $userCompanyModel = app(config('hub.model_user_company'));
+
         return $this->hasManyThrough(
             $userCompany,
             $userCompanyModel,

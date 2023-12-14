@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 abstract class AuthenticateHubHelpers
 {
     /**
-     * @param null $abstract
-     * @param array $parameters
+     * @param  null  $abstract
      * @return Container|mixed|object
+     *
      * @throws BindingResolutionException
      */
     protected function app($abstract = null, array $parameters = [])
@@ -29,8 +29,6 @@ abstract class AuthenticateHubHelpers
     }
 
     /**
-     * @param Request $request
-     * @return string
      * @throws AuthenticationException
      */
     protected function setToken(Request $request): string
@@ -45,8 +43,8 @@ abstract class AuthenticateHubHelpers
     }
 
     /**
-     * @param string $message
-     * @param null $previous
+     * @param  null  $previous
+     *
      * @throws AuthenticationException
      */
     protected function throw(string $message, $previous = null): void

@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Http;
 
 /**
  * Class Hub.
- *
- * @package BildVitta\Hub
  */
 class Hub extends Factory
 {
@@ -27,7 +25,7 @@ class Hub extends Factory
     private const DEFAULT_HEADERS = [
         'content-type' => 'application/json',
         'accept' => 'application/json',
-        'User-Agent' => 'ISS v0.0.1-alpha'
+        'User-Agent' => 'ISS v0.0.1-alpha',
     ];
 
     /**
@@ -35,14 +33,8 @@ class Hub extends Factory
      */
     private const DEFAULT_OPTIONS = ['allow_redirects' => false];
 
-    /**
-     * @var string
-     */
     public string $baseUrl;
 
-    /**
-     * @var PendingRequest
-     */
     public PendingRequest $request;
 
     /**
@@ -64,9 +56,6 @@ class Hub extends Factory
         $this->request = $this->prepareRequest();
     }
 
-    /**
-     * @return PendingRequest
-     */
     private function prepareRequest(): PendingRequest
     {
         $this->baseUrl = config('hub.base_uri').config('hub.prefix');
@@ -77,36 +66,21 @@ class Hub extends Factory
             ->withHeaders(self::DEFAULT_HEADERS);
     }
 
-    /**
-     * @return AuthResource
-     */
     public function auth(): AuthResource
     {
         return new AuthResource($this);
     }
 
-    /**
-     * @return UserResource
-     */
     public function users(): UserResource
     {
         return new UserResource($this);
     }
 
-    /**
-     * @return CompanyResource
-     */
     public function companies(): CompanyResource
     {
         return new CompanyResource($this);
     }
 
-    /**
-     * @param  string|null  $token
-     * @param  bool         $programmatic
-     *
-     * @return Hub
-     */
     public function setToken(?string $token = null, bool $programmatic = false): Hub
     {
         $this->token = $token;

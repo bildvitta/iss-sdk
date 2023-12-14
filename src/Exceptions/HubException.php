@@ -7,8 +7,6 @@ use Throwable;
 
 /**
  * Class HubException.
- *
- * @package BildVitta\Hub\Exceptions
  */
 class HubException extends Exception implements Throwable
 {

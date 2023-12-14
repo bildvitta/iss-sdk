@@ -11,8 +11,8 @@ use Spatie\Permission\Traits\HasRoles;
 class HubPosition extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     use HasRoles;
+    use SoftDeletes;
 
     protected $table = 'hub_positions';
 
@@ -26,12 +26,14 @@ class HubPosition extends Model
     public function parent_position(): BelongsTo
     {
         $positionModel = app(config('hub.model_position'));
+
         return $this->belongsTo($positionModel, 'parent_position_id', 'id');
     }
 
     public function user_companies()
     {
         $userCompanyModel = app(config('hub.model_user_company'));
+
         return $this->hasMany($userCompanyModel, 'position_id', 'id');
     }
 }

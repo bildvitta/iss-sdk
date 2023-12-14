@@ -8,7 +8,7 @@ class IssSdkCreateCompanyTable extends Migration
 {
     public function up()
     {
-        if (!Schema::hasTable('hub_companies')) {
+        if (! Schema::hasTable('hub_companies')) {
             Schema::create('hub_companies', function (Blueprint $table) {
                 $table->id();
                 $table->uuid('uuid');
@@ -20,7 +20,7 @@ class IssSdkCreateCompanyTable extends Migration
 
         $userModel = app(config('hub.model_user'));
 
-        if (!Schema::hasColumn($userModel->getTable(), 'company_id')) {
+        if (! Schema::hasColumn($userModel->getTable(), 'company_id')) {
             Schema::table($userModel->getTable(), function (Blueprint $table) {
                 $table->unsignedBigInteger('company_id')->nullable();
 

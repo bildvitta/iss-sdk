@@ -1,6 +1,5 @@
 <?php
 
-
 namespace BildVitta\Hub\Traits;
 
 use BildVitta\Hub\Entities\HubUser;
@@ -42,13 +41,10 @@ trait LoginUser
         return $this->loginByUserId($userId);
     }
 
-    /**
-     * @param string $bearerToken
-     * @return stdClass
-     */
     protected function getUser(string $bearerToken): stdClass
     {
         $response = $this->app('hub', [$bearerToken])->users()->me();
+
         return $response->object()->result;
     }
 
@@ -58,13 +54,13 @@ trait LoginUser
 
         $user = $userModel::firstOrNew([
             'hub_uuid' => $apiUser->uuid,
-            'email' => $apiUser->email
+            'email' => $apiUser->email,
         ], [
             'uuid' => Uuid::uuid4(),
             'name' => $apiUser->name,
             'remember_token' => Str::random(10),
             'email_verified_at' => Carbon::now(),
-            'password' => bcrypt(uniqid(rand()))
+            'password' => bcrypt(uniqid(rand())),
         ]);
 
         if (property_exists($apiUser, 'is_superuser')) {
@@ -126,7 +122,7 @@ trait LoginUser
             $permissionsInsert[] = ['name' => $permission, 'guard_name' => 'web'];
         }
 
-        if (!empty($permissionsInsert)) {
+        if (! empty($permissionsInsert)) {
             Permission::insert($permissionsInsert);
         }
 
@@ -134,7 +130,7 @@ trait LoginUser
         $userPermissionsDiff = array_diff($permissionsArray, $userLocalPermissions);
         $userLocalPermissionsDiff = array_diff($userLocalPermissions, $permissionsArray);
 
-        if (!empty($userPermissionsDiff) || !empty($userLocalPermissionsDiff)) {
+        if (! empty($userPermissionsDiff) || ! empty($userLocalPermissionsDiff)) {
             $user->syncPermissions(...collect($permissionsArray)->toArray());
             $user->refresh();
         }
@@ -146,14 +142,16 @@ trait LoginUser
     {
         $permissionsArray = [];
         foreach ($userPermissions as $key => $value) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 $permissionsArray[] = "$key";
+
                 continue;
             }
             foreach ($value as $array) {
                 $permissionsArray[] = "$key";
             }
         }
+
         return $permissionsArray;
     }
 
@@ -188,6 +186,7 @@ trait LoginUser
     private function getCompany(string $companyUuid): stdClass
     {
         $response = app('hub', [''])->companies()->findByUuid($companyUuid);
+
         return $response->object()->result;
     }
 

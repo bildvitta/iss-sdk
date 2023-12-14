@@ -1,6 +1,5 @@
 <?php
 
-
 namespace BildVitta\Hub\Http\Controllers\Auth;
 
 use BildVitta\Hub\Entities\HubOauthToken;
@@ -11,7 +10,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class CallbackController
- * @package BildVitta\Hub\Http\Controllers\Auth
  */
 class CallbackController extends AuthController
 {
@@ -24,14 +22,14 @@ class CallbackController extends AuthController
         $stateFromCache = cache()->pull("state.{$stateComplement}", '');
         $url = cache()->pull($stateFromCache);
 
-        if (!(strlen($stateFromCache) > 0 && $stateFromCache === $stateFromParam)) {
+        if (! (strlen($stateFromCache) > 0 && $stateFromCache === $stateFromParam)) {
             throw new NotFoundHttpException(__('State is not valid'));
         }
 
-        $token_uri = config('hub.base_uri') . config('hub.oauth.token_uri');
+        $token_uri = config('hub.base_uri').config('hub.oauth.token_uri');
 
         $response = Http::withHeaders([
-            'Accept' => 'application/json'
+            'Accept' => 'application/json',
         ])->asForm()->post($token_uri, [
             'grant_type' => 'authorization_code',
             'client_id' => config('hub.oauth.client_id'),
