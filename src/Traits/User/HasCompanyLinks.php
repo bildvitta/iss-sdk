@@ -17,8 +17,16 @@ trait HasCompanyLinks
     {
         $userCompanyModel = app(config('hub.model_user_company'));
 
-        return $this->hasOne($userCompanyModel, 'user_id', 'id')
+        $user_company = $this->hasOne($userCompanyModel, 'user_id', 'id')
             ->where('company_id', $this->company_id);
+
+        if (! $user_company->exists() && $this->hasMainLinkedCompanies()) {
+            $main_companies = $this->getMainLinkedCompanies();
+            $user_company = $this->hasOne($userCompanyModel, 'user_id', 'id')
+                ->whereIn('company_id', $main_companies);
+        }
+
+        return $user_company;
     }
 
     public function user_companies(): HasMany
@@ -63,5 +71,22 @@ trait HasCompanyLinks
         return Attribute::get(function () {
             return $this->user_company?->real_estate_developments ?? collect([]);
         });
+    }
+
+    public function hasAllRealEstateDevelopments(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->user_company?->has_all_real_estate_developments ?? false;
+        });
+    }
+
+    public function getMainLinkedCompanies(): array
+    {
+        return $this->company_links()->whereNull('main_company_id')->get(['companies.id'])->pluck(['id'])->toArray();
+    }
+
+    public function hasMainLinkedCompanies(): bool
+    {
+        return $this->company_links()->whereNull('main_company_id')->exists();
     }
 }
