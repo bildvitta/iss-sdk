@@ -7,14 +7,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class HubUser.
- *
- * @package BildVitta\Hub\Entities
  */
 class HubUser extends Model
 {
     use SoftDeletes;
 
     public $incrementing = false;
+
     protected $table = 'hub_users';
 
     /**

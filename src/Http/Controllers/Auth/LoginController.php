@@ -1,6 +1,5 @@
 <?php
 
-
 namespace BildVitta\Hub\Http\Controllers\Auth;
 
 use BildVitta\Hub\Http\Requests\LoginRequest;
@@ -8,7 +7,6 @@ use Illuminate\Support\Str;
 
 /**
  * Class LoginController
- * @package BildVitta\Hub\Http\Controllers\Auth
  */
 class LoginController extends AuthController
 {
@@ -26,14 +24,14 @@ class LoginController extends AuthController
             'response_type' => 'code',
             'scope' => config('hub.oauth.scopes'),
             'state' => "{$state}.{$stateComplement}",
-            'url' => $request->get('url', '/')
+            'url' => $request->get('url', '/'),
         ]);
 
-        $redirect_uri = config('hub.front_uri') . config('hub.oauth.authorize_uri') . '?' . $query;
+        $redirect_uri = config('hub.front_uri').config('hub.oauth.authorize_uri').'?'.$query;
 
         return response()->json(
             [
-                'login_url' => $redirect_uri
+                'login_url' => $redirect_uri,
             ]
         );
     }

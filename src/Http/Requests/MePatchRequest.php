@@ -9,7 +9,7 @@ class MePatchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'companies' => ['required', 'uuid']
+            'companies' => ['required', 'uuid'],
         ];
     }
 

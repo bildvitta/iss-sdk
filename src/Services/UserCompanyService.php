@@ -7,97 +7,102 @@ use Illuminate\Support\Facades\Cache;
 class UserCompanyService
 {
     private static $userChildrens = [];
+
     private static $userParents = [];
+
     private static $positions = [];
+
     private static $positionsByCompany = [];
 
     const MANAGER = 0;
+
     const SUPERVISOR = 1;
+
     const BROKER = 2;
 
     public static function clearCacheByUserCompany($userCompany)
     {
-        Cache::tags(["UserCompanyService", "User-{$userCompany->user->uuid}"])->flush();
+        Cache::tags(['UserCompanyService', "User-{$userCompany->user->uuid}"])->flush();
     }
 
     /**
      * Get users below parent user
-     * 
-     * @param string $parentUserUuid
-     * @param string $parentUserUuid
-     * @param string $companyUuid
-     * @param boolean $allBelow
-     * @param int $onlyPositionOrder null|0|1|2
-     * @param array $attributes
+     *
+     * @param  string  $parentUserUuid
+     * @param  string  $parentUserUuid
+     * @param  string  $companyUuid
+     * @param  bool  $allBelow
+     * @param  int  $onlyPositionOrder null|0|1|2
+     * @param  array  $attributes
      * @return User
-     * 
      */
-    public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false, $onlyPositionOrder = null, $attributes = ["uuid", "name", "is_active"])
+    public static function getUsersByParentUuid($parentUserUuid, $positionUuid, $companyUuid, $allBelow = false, $onlyPositionOrder = null, $attributes = ['uuid', 'name', 'is_active'])
     {
-        $cacheKey = "UCS-UsersByParentUuid-$parentUserUuid-$positionUuid-$companyUuid-" . ($allBelow ? "true" : "false") . ($onlyPositionOrder !== null ? '-' . $onlyPositionOrder : '') . "-" . implode("-", $attributes);
+        $cacheKey = "UCS-UsersByParentUuid-$parentUserUuid-$positionUuid-$companyUuid-".($allBelow ? 'true' : 'false').($onlyPositionOrder !== null ? '-'.$onlyPositionOrder : '').'-'.implode('-', $attributes);
 
         try {
             self::$userChildrens = [];
             self::$userParents = [];
 
-            if (Cache::tags(["UserCompanyService", "User-$parentUserUuid"])->has($cacheKey)) {
-                return Cache::tags(["UserCompanyService", "User-$parentUserUuid"])->get($cacheKey);
+            if (Cache::tags(['UserCompanyService', "User-$parentUserUuid"])->has($cacheKey)) {
+                return Cache::tags(['UserCompanyService', "User-$parentUserUuid"])->get($cacheKey);
             }
 
-            $modelUserKey = config("hub.model_user_key");
+            $modelUserKey = config('hub.model_user_key');
 
-            $userModel = app(config("hub.model_user"));
-            $parentUser = $userModel::with("user_companies")
+            $userModel = app(config('hub.model_user'));
+            $parentUser = $userModel::with('user_companies')
                 ->where($modelUserKey, $parentUserUuid)->first();
 
-            if (!$parentUser) {
+            if (! $parentUser) {
                 return collect([]);
             }
 
-            $positionModel = app(config("hub.model_position"));
-            $position = $positionModel::where("uuid", $positionUuid)->first();
+            $positionModel = app(config('hub.model_position'));
+            $position = $positionModel::where('uuid', $positionUuid)->first();
 
-            if (!$position) {
+            if (! $position) {
                 return collect([]);
             }
 
-            $companyModel = app(config("hub.model_company"));
-            $company = $companyModel::where("uuid", $companyUuid)->first();
+            $companyModel = app(config('hub.model_company'));
+            $company = $companyModel::where('uuid', $companyUuid)->first();
 
-            if (!$company) {
+            if (! $company) {
                 return collect([]);
             }
 
             $userCompany = $parentUser->user_companies()
-                ->with("user_company_parent")
-                ->where("company_id", $company->id)
-                ->where("position_id", $position->id)
+                ->with('user_company_parent')
+                ->where('company_id', $company->id)
+                ->where('position_id', $position->id)
                 ->first();
 
-            if (!$userCompany) {
+            if (! $userCompany) {
                 return collect([]);
             }
 
-            if($onlyPositionOrder !== null) {
+            if ($onlyPositionOrder !== null) {
                 self::$positionsByCompany = self::getSortedPositions($companyUuid)[$onlyPositionOrder];
             }
 
             $userCompanyParents = $userCompany->user_company_parent()->get();
 
-            if (!$allBelow) {
+            if (! $allBelow) {
                 self::getUserChildrens($userCompanyParents);
             }
 
-            if ($allBelow) {                
+            if ($allBelow) {
                 self::getAllUserChildrens($userCompanyParents, $onlyPositionOrder);
             }
 
-            return Cache::tags(["UserCompanyService", "User-$parentUserUuid"])->remember($cacheKey, now()->addHour(), function () use ($userModel, $attributes) {
-                return $userModel::whereIn("id", self::$userChildrens)
+            return Cache::tags(['UserCompanyService', "User-$parentUserUuid"])->remember($cacheKey, now()->addHour(), function () use ($userModel, $attributes) {
+                return $userModel::whereIn('id', self::$userChildrens)
                     ->get($attributes);
             });
         } catch (\Exception $e) {
             report($e);
+
             return collect([]);
         }
     }
@@ -107,11 +112,11 @@ class UserCompanyService
         foreach ($userCompanyParents as $userCompanyParent) {
             $userCompanyChildren = $userCompanyParent
                 ->user_company_children()
-                ->select("user_id")
+                ->select('user_id')
                 ->first();
 
-            if (!$userCompanyChildren) {
-                throw new \Exception("Falha ao buscar usuários de cargo filho!");
+            if (! $userCompanyChildren) {
+                throw new \Exception('Falha ao buscar usuários de cargo filho!');
             }
 
             self::$userChildrens[] = $userCompanyChildren->user_id;
@@ -126,16 +131,16 @@ class UserCompanyService
 
             $userCompanyChildren = $userCompanyParent
                 ->user_company_children()
-                ->select("id", "user_id", "position_id")
+                ->select('id', 'user_id', 'position_id')
                 ->first();
 
-            if (!$userCompanyChildren) {
-                throw new \Exception("Falha ao buscar todos os usuários de cargo filho!");
+            if (! $userCompanyChildren) {
+                throw new \Exception('Falha ao buscar todos os usuários de cargo filho!');
             }
 
-            if($onlyPositionOrder === null || $userCompanyChildren->position_id && self::$positionsByCompany['id'] == $userCompanyChildren->position_id) {
+            if ($onlyPositionOrder === null || $userCompanyChildren->position_id && self::$positionsByCompany['id'] == $userCompanyChildren->position_id) {
                 self::$userChildrens[] = $userCompanyChildren->user_id;
-            }            
+            }
 
             $userChildrenIsParent = $userCompanyChildren->user_company_parent()->get();
 
@@ -151,39 +156,39 @@ class UserCompanyService
 
     public static function getAllParentsByUserUuid($userUuid, $companyUuid, $onlyTop = false)
     {
-        $cacheKey = "UCS-AllParentsByUserUuid-$userUuid-$companyUuid-" . ($onlyTop ? "true" : "false");
+        $cacheKey = "UCS-AllParentsByUserUuid-$userUuid-$companyUuid-".($onlyTop ? 'true' : 'false');
 
         try {
             self::$userChildrens = [];
             self::$userParents = [];
 
-            if (Cache::tags(["UserCompanyService", "User-$userUuid"])->has($cacheKey)) {
-                return Cache::tags(["UserCompanyService", "User-$userUuid"])->get($cacheKey);
+            if (Cache::tags(['UserCompanyService', "User-$userUuid"])->has($cacheKey)) {
+                return Cache::tags(['UserCompanyService', "User-$userUuid"])->get($cacheKey);
             }
 
-            $userModel = app(config("hub.model_user"));
-            $modelUserKey = config("hub.model_user_key");
-            $user = $userModel::with("user_companies")
+            $userModel = app(config('hub.model_user'));
+            $modelUserKey = config('hub.model_user_key');
+            $user = $userModel::with('user_companies')
                 ->where($modelUserKey, $userUuid)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return collect([]);
             }
 
-            $companyModel = app(config("hub.model_company"));
-            $company = $companyModel::where("uuid", $companyUuid)->first();
+            $companyModel = app(config('hub.model_company'));
+            $company = $companyModel::where('uuid', $companyUuid)->first();
 
-            if (!$company) {
+            if (! $company) {
                 return collect([]);
             }
 
             $userCompanyChildren = $user->user_companies
-                ->where("company_id", $company->id)
+                ->where('company_id', $company->id)
                 ->first()
                 ?->user_company_children()
                 ?->first();
 
-            if (!$userCompanyChildren) {
+            if (! $userCompanyChildren) {
                 return collect([]);
             }
 
@@ -195,11 +200,12 @@ class UserCompanyService
                 self::$userParents[] = $topUserId;
             }
 
-            return Cache::tags(["UserCompanyService", "User-$userUuid"])->remember($cacheKey, now()->addHour(), function () {
+            return Cache::tags(['UserCompanyService', "User-$userUuid"])->remember($cacheKey, now()->addHour(), function () {
                 return collect(self::$userParents)->reverse();
             });
         } catch (\Exception $e) {
             report($e);
+
             return collect([]);
         }
     }
@@ -207,15 +213,15 @@ class UserCompanyService
     private static function getAllUserParentsByUserCompanyChildren($userCompanyChildren, $onlyPositionOrder = null)
     {
         $userCompanyParent = $userCompanyChildren->user_company_parent()
-            ->first();        
+            ->first();
 
-        if (!$userCompanyParent) {
-            throw new \Exception("Falha ao buscar todos os usuários de cargo pai!");
+        if (! $userCompanyParent) {
+            throw new \Exception('Falha ao buscar todos os usuários de cargo pai!');
         }
 
-        if($onlyPositionOrder === null || $userCompanyParent->position_id && self::$positionsByCompany['id'] == $userCompanyParent->position_id) {
+        if ($onlyPositionOrder === null || $userCompanyParent->position_id && self::$positionsByCompany['id'] == $userCompanyParent->position_id) {
             self::$userParents[] = $userCompanyParent;
-        }         
+        }
 
         $userCompanyChildren = $userCompanyParent->user_company_children()
             ->first();
@@ -227,43 +233,42 @@ class UserCompanyService
 
     /**
      * Get users by companyUuid and positionUuid
-     * 
-     * @param string $companyUuid
-     * @param int $positionOrder 0|1|2
-     * @param array $filter
-     * @param array $attributes
-     * @return User
      *
+     * @param  string  $companyUuid
+     * @param  int  $positionOrder 0|1|2
+     * @param  array  $filter
+     * @param  array  $attributes
+     * @return User
      */
     public static function getUsersByCompanyUuidAndPositionOrder($companyUuid, $positionOrder, $filter = ['is_active' => 1], $attributes = ['uuid', 'name', 'is_active'])
     {
-        $cacheKey = "UCS-UsersByCompanyUuidAndPositionOrder-{$companyUuid}-{$positionOrder}-filter-" . implode("-", $filter) . "-attributes-" . implode("-", $attributes);
+        $cacheKey = "UCS-UsersByCompanyUuidAndPositionOrder-{$companyUuid}-{$positionOrder}-filter-".implode('-', $filter).'-attributes-'.implode('-', $attributes);
 
-        if (Cache::tags(["UserCompanyService", "Company-$companyUuid"])->has($cacheKey)) {
-            return Cache::tags(["UserCompanyService", "Company-$companyUuid"])->get($cacheKey);
+        if (Cache::tags(['UserCompanyService', "Company-$companyUuid"])->has($cacheKey)) {
+            return Cache::tags(['UserCompanyService', "Company-$companyUuid"])->get($cacheKey);
         }
 
-        $companyModel = app(config("hub.model_company"));
-        $company = $companyModel::where("uuid", $companyUuid)->first();
+        $companyModel = app(config('hub.model_company'));
+        $company = $companyModel::where('uuid', $companyUuid)->first();
 
-        if (!$company) {
+        if (! $company) {
             return collect([]);
         }
 
-        if (!count($attributes)) {
+        if (! count($attributes)) {
             return collect([]);
         }
 
         $position = self::getSortedPositions($companyUuid)[$positionOrder];
 
-        $userCompanyModel = app(config("hub.model_user_company"));
-        $userModel = app(config("hub.model_user"));
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userModel = app(config('hub.model_user'));
         $tableUser = $userModel->getTable();
         $tableUserCompany = $userCompanyModel->getTable();
 
-        if($attributes && count($attributes)) {
-            $attributes = collect($attributes)->map(function($item) use($tableUser) {
-                return $tableUser . '.' . $item;
+        if ($attributes && count($attributes)) {
+            $attributes = collect($attributes)->map(function ($item) use ($tableUser) {
+                return $tableUser.'.'.$item;
             });
         }
 
@@ -273,15 +278,15 @@ class UserCompanyService
             ->select($attributes->toArray())
             ->orderBy('name');
 
-        if(count($filter)) {
-            foreach($filter as $key=>$value) {
-                $users->where("{$tableUser}." . $key, $value);
+        if (count($filter)) {
+            foreach ($filter as $key => $value) {
+                $users->where("{$tableUser}.".$key, $value);
             }
         }
 
         $users = $users->get();
 
-        return Cache::tags(["UserCompanyService", "Company-$companyUuid"])->remember($cacheKey, now()->addHour(), function () use ($users) {
+        return Cache::tags(['UserCompanyService', "Company-$companyUuid"])->remember($cacheKey, now()->addHour(), function () use ($users) {
             return $users;
         });
     }
@@ -289,23 +294,23 @@ class UserCompanyService
     public static function getSortedPositions($companyUuid)
     {
         self::$positions = [];
-        
-        $positionModel = app(config("hub.model_position"));
-        $companyModel = app(config("hub.model_company"));
+
+        $positionModel = app(config('hub.model_position'));
+        $companyModel = app(config('hub.model_company'));
 
         $company = $companyModel::whereUuid($companyUuid)->first();
 
-        if (!$company) {
+        if (! $company) {
             return [];
         }
 
         $companyId = $company->main_company_id ?? $company->id;
 
-        $positions = $positionModel->where("company_id", $companyId)
+        $positions = $positionModel->where('company_id', $companyId)
             ->get()
             ->toArray();
 
-        if (!$positions) {
+        if (! $positions) {
             return [];
         }
 
@@ -316,12 +321,12 @@ class UserCompanyService
 
     private static function sortPositions($positions)
     {
-        if (!count($positions)) {
+        if (! count($positions)) {
             return;
         }
 
         foreach ($positions as $key => $position) {
-            if (!$position["parent_position_id"]) {
+            if (! $position['parent_position_id']) {
                 self::$positions[] = $position;
                 unset($positions[$key]);
             }
@@ -329,7 +334,7 @@ class UserCompanyService
 
         foreach ($positions as $key => $position) {
             $lastPosition = end(self::$positions);
-            if ($position["parent_position_id"] == $lastPosition["id"]) {
+            if ($position['parent_position_id'] == $lastPosition['id']) {
                 self::$positions[] = $position;
                 unset($positions[$key]);
             }
@@ -342,31 +347,30 @@ class UserCompanyService
 
     /**
      * Check position user in company
-     * 
-     * @param string $companyUuid
-     * @param string $userUuid
-     * @param int $positionOrder 0|1|2
-     * @return boolean
-     * 
+     *
+     * @param  string  $companyUuid
+     * @param  string  $userUuid
+     * @param  int  $positionOrder 0|1|2
+     * @return bool
      */
     public static function checkPositionUser($companyUuid, $userUuid, $positionOrder)
     {
         $cacheKey = "UCS-CheckPositionUser-{$companyUuid}-{$userUuid}-{$positionOrder}";
 
-        if (Cache::tags(["UserCompanyService", "User-$userUuid"])->has($cacheKey)) {
-            return Cache::tags(["UserCompanyService", "User-$userUuid"])->get($cacheKey);
+        if (Cache::tags(['UserCompanyService', "User-$userUuid"])->has($cacheKey)) {
+            return Cache::tags(['UserCompanyService', "User-$userUuid"])->get($cacheKey);
         }
 
         $position = self::getSortedPositions($companyUuid)[$positionOrder];
 
-        $userCompanyModel = app(config("hub.model_user_company"));
-        $userModel = app(config("hub.model_user"));
-        $companyModel = app(config("hub.model_company"));
+        $userCompanyModel = app(config('hub.model_user_company'));
+        $userModel = app(config('hub.model_user'));
+        $companyModel = app(config('hub.model_company'));
         $tableUser = $userModel->getTable();
         $tableUserCompany = $userCompanyModel->getTable();
         $tableCompany = $companyModel->getTable();
-        $modelUserKey = config("hub.model_user_key");
-        
+        $modelUserKey = config('hub.model_user_key');
+
         $userCompany = $userCompanyModel::join($tableUser, "{$tableUserCompany}.user_id", "{$tableUser}.id")
             ->join($tableCompany, "{$tableCompany}.id", "{$tableUserCompany}.company_id")
             ->where("{$tableCompany}.uuid", $companyUuid)
@@ -374,133 +378,133 @@ class UserCompanyService
             ->select(["{$tableUserCompany}.position_id"])
             ->first();
 
-        if(!$userCompany) {
+        if (! $userCompany) {
             return false;
         }
 
-        return Cache::tags(["UserCompanyService", "User-$companyUuid"])->remember($cacheKey, now()->addHour(), function () use ($userCompany, $position) {
+        return Cache::tags(['UserCompanyService', "User-$companyUuid"])->remember($cacheKey, now()->addHour(), function () use ($userCompany, $position) {
             return $userCompany->toArray()['position_id'] == $position['id'];
-        });        
+        });
 
     }
 
     /**
      * Get parent users by user uuid and company uuid
-     * 
-     * @param string $userUuid
-     * @param string $companyUuid
-     * @param int $onlyPositionOrder null|0|1
-     * @param array $attributes
+     *
+     * @param  string  $userUuid
+     * @param  string  $companyUuid
+     * @param  int  $onlyPositionOrder null|0|1
+     * @param  array  $attributes
      * @return User
-     * 
      */
-    public static function getParentUsersByUserUuid($userUuid, $companyUuid, $onlyPositionOrder = null, $attributes = ["uuid", "name", "is_active"])
+    public static function getParentUsersByUserUuid($userUuid, $companyUuid, $onlyPositionOrder = null, $attributes = ['uuid', 'name', 'is_active'])
     {
-        $cacheKey = "UCS-ParentUsersByUserUuid-$userUuid-$companyUuid-" . ($onlyPositionOrder !== null ? '-' . $onlyPositionOrder : '') . "-" . implode("-", $attributes);
+        $cacheKey = "UCS-ParentUsersByUserUuid-$userUuid-$companyUuid-".($onlyPositionOrder !== null ? '-'.$onlyPositionOrder : '').'-'.implode('-', $attributes);
 
         try {
             self::$userChildrens = [];
             self::$userParents = [];
 
-            if (Cache::tags(["UserCompanyService", "User-$userUuid"])->has($cacheKey)) {
-                return Cache::tags(["UserCompanyService", "User-$userUuid"])->get($cacheKey);
+            if (Cache::tags(['UserCompanyService', "User-$userUuid"])->has($cacheKey)) {
+                return Cache::tags(['UserCompanyService', "User-$userUuid"])->get($cacheKey);
             }
 
-            $userModel = app(config("hub.model_user"));
-            $modelUserKey = config("hub.model_user_key");
-            $user = $userModel::with("user_companies")
+            $userModel = app(config('hub.model_user'));
+            $modelUserKey = config('hub.model_user_key');
+            $user = $userModel::with('user_companies')
                 ->where($modelUserKey, $userUuid)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return collect([]);
             }
 
-            $companyModel = app(config("hub.model_company"));
-            $company = $companyModel::where("uuid", $companyUuid)->first();
+            $companyModel = app(config('hub.model_company'));
+            $company = $companyModel::where('uuid', $companyUuid)->first();
 
-            if (!$company) {
+            if (! $company) {
                 return collect([]);
             }
 
             $userCompanyChildren = $user->user_companies
-                ->where("company_id", $company->id)
-                ->where("is_seller", true)
+                ->where('company_id', $company->id)
+                ->where('is_seller', true)
                 ->first()
                 ->user_company_children()
                 ->first();
 
-            if (!$userCompanyChildren) {
+            if (! $userCompanyChildren) {
                 return collect([]);
             }
 
-            if($onlyPositionOrder !== null) {
+            if ($onlyPositionOrder !== null) {
                 self::$positionsByCompany = self::getSortedPositions($companyUuid)[$onlyPositionOrder];
-            }   
+            }
 
-            self::getAllUserParentsByUserCompanyChildren($userCompanyChildren, $onlyPositionOrder);            
-                    
-            return Cache::tags(["UserCompanyService", "User-$userUuid"])->remember($cacheKey, now()->addHour(), function () use($userModel, $attributes) {
-                return $userModel::whereIn("id", collect(self::$userParents)->pluck('user_id'))
+            self::getAllUserParentsByUserCompanyChildren($userCompanyChildren, $onlyPositionOrder);
+
+            return Cache::tags(['UserCompanyService', "User-$userUuid"])->remember($cacheKey, now()->addHour(), function () use ($userModel, $attributes) {
+                return $userModel::whereIn('id', collect(self::$userParents)->pluck('user_id'))
                     ->get($attributes);
             });
         } catch (\Exception $e) {
             report($e);
+
             return collect([]);
         }
     }
 
     /**
      * Get parent user by user uuid and company uuid
-     * 
-     * @param string $userUuid
-     * @param string $companyUuid
-     * @param array $attributes
+     *
+     * @param  string  $userUuid
+     * @param  string  $companyUuid
+     * @param  array  $attributes
      * @return User
-     * 
      */
-    public static function getParentUser($userUuid, $companyUuid, $attributes = ["uuid", "name", "is_active"])
+    public static function getParentUser($userUuid, $companyUuid, $attributes = ['uuid', 'name', 'is_active'])
     {
-        $cacheKey = "UCS-ParentUser-$userUuid-$companyUuid-" . implode("-", $attributes);
+        $cacheKey = "UCS-ParentUser-$userUuid-$companyUuid-".implode('-', $attributes);
 
         try {
-            if (Cache::tags(["UserCompanyService", "User-$userUuid"])->has($cacheKey)) {
-                return Cache::tags(["UserCompanyService", "User-$userUuid"])->get($cacheKey);
+            if (Cache::tags(['UserCompanyService', "User-$userUuid"])->has($cacheKey)) {
+                return Cache::tags(['UserCompanyService', "User-$userUuid"])->get($cacheKey);
             }
 
-            $userModel = app(config("hub.model_user"));
-            $modelUserKey = config("hub.model_user_key");
-            $user = $userModel::with("user_companies")
+            $userModel = app(config('hub.model_user'));
+            $modelUserKey = config('hub.model_user_key');
+            $user = $userModel::with('user_companies')
                 ->where($modelUserKey, $userUuid)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return collect([]);
             }
 
-            $companyModel = app(config("hub.model_company"));
-            $company = $companyModel::where("uuid", $companyUuid)->first();
+            $companyModel = app(config('hub.model_company'));
+            $company = $companyModel::where('uuid', $companyUuid)->first();
 
-            if (!$company) {
+            if (! $company) {
                 return collect([]);
             }
 
             $userParent = $user->user_companies
-                ->where("company_id", $company->id)
-                ->where("is_seller", true)
+                ->where('company_id', $company->id)
+                ->where('is_seller', true)
                 ->first()
                 ->user_company_children
                 ->user_company_parent
                 ->user;
 
-            if (!$userParent) {
+            if (! $userParent) {
                 return collect([]);
             }
 
-            return Cache::tags(["UserCompanyService", "User-$userUuid"])->remember($cacheKey, now()->addHour(), function () use($userModel, $userParent, $attributes) {
-                return $userModel::where("id", $userParent->id)
+            return Cache::tags(['UserCompanyService', "User-$userUuid"])->remember($cacheKey, now()->addHour(), function () use ($userModel, $userParent, $attributes) {
+                return $userModel::where('id', $userParent->id)
                     ->get($attributes);
             });
         } catch (\Exception $e) {
             report($e);
+
             return collect([]);
         }
     }

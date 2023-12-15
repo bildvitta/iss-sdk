@@ -12,8 +12,8 @@ use Spatie\Permission\Traits\HasRoles;
 class HubUserCompany extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     use HasRoles;
+    use SoftDeletes;
 
     protected $table = 'hub_user_companies';
 
@@ -47,30 +47,35 @@ class HubUserCompany extends Model
     public function user(): BelongsTo
     {
         $userModel = app(config('hub.model_user'));
+
         return $this->belongsTo($userModel, 'user_id', 'id');
     }
 
     public function company(): BelongsTo
     {
         $companyModel = app(config('hub.model_company'));
+
         return $this->belongsTo($companyModel, 'company_id', 'id');
     }
 
     public function position(): BelongsTo
     {
         $positionModel = app(config('hub.model_position'));
+
         return $this->belongsTo($positionModel, 'position_id', 'id');
     }
 
     public function user_company_parent()
     {
         $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+
         return $this->hasOne($userCompanyParentPositionModel, 'user_company_parent_id', 'id');
     }
 
     public function user_company_children()
     {
         $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+
         return $this->hasOne($userCompanyParentPositionModel, 'user_company_id', 'id');
     }
 
@@ -78,6 +83,7 @@ class HubUserCompany extends Model
     {
         $userCompanyModel = app(config('hub.model_user_company'));
         $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+
         return $this->hasManyThrough(
             $userCompanyModel,
             $userCompanyParentPositionModel,
@@ -92,6 +98,7 @@ class HubUserCompany extends Model
     {
         $userCompanyModel = app(config('hub.model_user_company'));
         $userCompanyParentPositionModel = app(config('hub.model_user_company_parent_position'));
+
         return $this->hasManyThrough(
             $userCompanyModel,
             $userCompanyParentPositionModel,
@@ -105,6 +112,7 @@ class HubUserCompany extends Model
     public function real_estate_developments()
     {
         $userCompanyRealEstateDevelopmentsModel = app(config('hub.model_user_company_real_estate_development'));
+
         return $this->hasMany($userCompanyRealEstateDevelopmentsModel, 'user_company_id', 'id');
     }
 }

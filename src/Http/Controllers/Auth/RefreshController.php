@@ -1,6 +1,5 @@
 <?php
 
-
 namespace BildVitta\Hub\Http\Controllers\Auth;
 
 use BildVitta\Hub\Entities\HubOauthToken;
@@ -10,7 +9,6 @@ use Illuminate\Support\Facades\Http;
 
 /**
  * Class RefreshController
- * @package BildVitta\Hub\Http\Controllers\Auth
  */
 class RefreshController extends AuthController
 {
@@ -21,11 +19,12 @@ class RefreshController extends AuthController
 
         if (is_null($bearerTokenCache)) {
             $loginUrl = new LoginController;
+
             return $loginUrl(new LoginRequest);
         }
 
-        if (!$bearerTokenCache->is_expired()) {
-            $refresh_uri = config('hub.base_uri') . config('hub.oauth.token_uri');
+        if (! $bearerTokenCache->is_expired()) {
+            $refresh_uri = config('hub.base_uri').config('hub.oauth.token_uri');
             $response = Http::asForm()->post($refresh_uri, [
                 'grant_type' => 'refresh_token',
                 'refresh_token' => $bearerTokenCache->refresh_token,
@@ -41,14 +40,14 @@ class RefreshController extends AuthController
                 new HubOauthToken($jsonCache),
                 now()->addSeconds($response->json('expires_in'))
             );
-            
+
             return response()->json([
-                'access_token' => $response->json('access_token')
+                'access_token' => $response->json('access_token'),
             ]);
         }
 
         return response()->json([
-            'access_token' => $bearerTokenCache->access_token
+            'access_token' => $bearerTokenCache->access_token,
         ]);
     }
 }

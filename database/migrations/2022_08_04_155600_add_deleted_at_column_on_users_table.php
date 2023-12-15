@@ -9,12 +9,12 @@ class AddDeletedAtColumnOnUsersTable extends Migration
     public function up()
     {
         $userModel = app(config('hub.model_user'));
-        if (!Schema::hasColumn($userModel->getTable(), 'deleted_at')) {
+        if (! Schema::hasColumn($userModel->getTable(), 'deleted_at')) {
             Schema::table($userModel->getTable(), function (Blueprint $table) {
                 $table->softDeletes();
             });
         }
-        if (!Schema::hasColumn($userModel->getTable(), 'is_active')) {
+        if (! Schema::hasColumn($userModel->getTable(), 'is_active')) {
             Schema::table($userModel->getTable(), function (Blueprint $table) {
                 $table->boolean('is_active')->default(true);
             });
@@ -29,7 +29,7 @@ class AddDeletedAtColumnOnUsersTable extends Migration
                 $table->dropSoftDeletes();
             });
         }
-        if (!Schema::hasColumn($userModel->getTable(), 'is_active')) {
+        if (! Schema::hasColumn($userModel->getTable(), 'is_active')) {
             Schema::table($userModel->getTable(), function (Blueprint $table) {
                 $table->dropColumn('is_active');
             });

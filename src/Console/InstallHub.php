@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpMissingFieldTypeInspection */
 
 namespace BildVitta\Hub\Console;
@@ -9,8 +10,6 @@ use Illuminate\Support\Facades\File;
 
 /**
  * Class InstallHubPackage.
- *
- * @package BildVitta\Hub\Console
  */
 class InstallHub extends Command
 {
@@ -21,7 +20,7 @@ class InstallHub extends Command
      */
     private const VENDOR_PUBLISH_CONFIG_PARAMS = [
         '--provider' => HubServiceProvider::class,
-        '--tag' => 'hub-config'
+        '--tag' => 'hub-config',
     ];
 
     /**
@@ -30,7 +29,7 @@ class InstallHub extends Command
      * @const array
      */
     private const VENDOR_PUBLISH_MIGRATION_PARAMS = [
-        '--provider' => \Spatie\Permission\PermissionServiceProvider::class
+        '--provider' => \Spatie\Permission\PermissionServiceProvider::class,
     ];
 
     /**
@@ -81,11 +80,6 @@ class InstallHub extends Command
         $this->info('Installed HubPackage');
     }
 
-    /**
-     * @param  string  $fileName
-     *
-     * @return bool
-     */
     private function configExists(string $fileName): bool
     {
         return File::exists(config_path($fileName));
@@ -93,8 +87,6 @@ class InstallHub extends Command
 
     /**
      * @param  bool|false  $forcePublish
-     *
-     * @return void
      */
     private function publishConfiguration($forcePublish = false): void
     {
@@ -109,8 +101,6 @@ class InstallHub extends Command
 
     /**
      * Should overwrite config file.
-     *
-     * @return bool
      */
     private function shouldOverwriteConfig(): bool
     {
@@ -122,9 +112,6 @@ class InstallHub extends Command
         return $this->confirm('Run migrations of Laravel Permissions package? If you have already done this step, do not do it again!');
     }
 
-    /**
-     * @return void
-     */
     private function publishMigration(): void
     {
         $this->call('vendor:publish', self::VENDOR_PUBLISH_MIGRATION_PARAMS);

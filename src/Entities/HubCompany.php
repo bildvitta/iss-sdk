@@ -13,7 +13,7 @@ class HubCompany extends Model
 
     protected $fillable = [
         'uuid',
-        'name'
+        'name',
     ];
 
     public function main_company()

@@ -15,14 +15,12 @@ use Illuminate\Support\Facades\Auth;
 class PermissionScope implements Scope
 {
     protected string $permission;
+
     protected string $attribute;
+
     protected ?Authenticatable $user;
 
-    /**
-     * @param string $permission
-     * @param string $attribute
-     */
-    public function __construct(string $permission, string $attribute = "uuid")
+    public function __construct(string $permission, string $attribute = 'uuid')
     {
         $this->permission = $permission;
         $this->attribute = $attribute;
@@ -30,11 +28,11 @@ class PermissionScope implements Scope
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function apply(Builder $builder, Model $model)
     {
-        if (!$this->user || $this->user->is_superuser) {
+        if (! $this->user || $this->user->is_superuser) {
             return;
         }
 
@@ -51,6 +49,7 @@ class PermissionScope implements Scope
     protected function getPermissionsIds()
     {
         $permission = $this->permission;
+
         return $this->user->getAllPermissions()
             ->pluck('name')
             ->filter(function ($value) use ($permission) {
@@ -60,12 +59,15 @@ class PermissionScope implements Scope
                     if (in_array($substr, ['*', 'template'])) {
                         return false;
                     }
+
                     return true;
                 }
+
                 return false;
             })
             ->map(function ($value) use ($permission) {
                 $substr = substr($value, strlen($permission));
+
                 return ltrim($substr, '.');
             });
     }

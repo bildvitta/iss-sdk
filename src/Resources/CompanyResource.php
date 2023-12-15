@@ -3,14 +3,11 @@
 namespace BildVitta\Hub\Resources;
 
 use BildVitta\Hub\Hub;
-use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 
 /**
  * Class CompanyResource.
- *
- * @package BildVitta\Hub\Resources
  */
 class CompanyResource extends Resource
 {
@@ -22,17 +19,12 @@ class CompanyResource extends Resource
     /**
      * @const string
      */
-    private const ENDPOINT_FIND_BY_UUID = self::PREFIX . '/%s';
+    private const ENDPOINT_FIND_BY_UUID = self::PREFIX.'/%s';
 
-    /**
-     * @var Hub
-     */
     private Hub $hub;
 
     /**
      * AuthResource constructor.
-     *
-     * @param Hub $hub
      */
     public function __construct(Hub $hub)
     {
@@ -43,21 +35,21 @@ class CompanyResource extends Resource
      *  Get all companies in Hub
      *
      * @return Response
+     *
      * @throws RequestException
      */
     public function getAllCompanies()
     {
         $url = vsprintf(self::ENDPOINT_FIND_BY_UUID, ['']);
         $hubUrl = $this->hub->setToken('', true);
+
         return $hubUrl->request->get($url)->throw();
     }
 
     /**
      * Checks if the token passed by parameter or previously loaded in the ISS Service is valid.
      *
-     * @param string $uuid
      *
-     * @return Response
      *
      * @throws RequestException
      */
@@ -76,13 +68,13 @@ class CompanyResource extends Resource
         $this->hub = $this->hub->setToken('', true);
 
         $body = [];
-        if (!empty($permissionProjectSlug)) {
+        if (! empty($permissionProjectSlug)) {
             $body['user_permission']['project_slug'] = $permissionProjectSlug;
         }
-        if (!empty($permission)) {
+        if (! empty($permission)) {
             $body['user_permission']['permission'] = $permission;
         }
-        if (!empty($userUuid)) {
+        if (! empty($userUuid)) {
             $body['user_permission']['user_uuid'] = $userUuid;
         }
 

@@ -19,6 +19,7 @@ class HubUserCompanyRealEstateDevelopment extends Model
     public function user_company()
     {
         $userCompanyModel = app(config('hub.model_user_company'));
+
         return $this->belongsTo($userCompanyModel, 'user_company_id', 'id');
     }
 }

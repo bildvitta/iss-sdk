@@ -9,8 +9,6 @@ use Illuminate\Http\Client\Response;
 
 /**
  * Class AuthResource.
- *
- * @package BildVitta\Hub\Resources
  */
 class AuthResource extends Resource implements AuthResourceContract
 {
@@ -22,22 +20,17 @@ class AuthResource extends Resource implements AuthResourceContract
     /**
      * @const string
      */
-    private const ENDPOINT_CHECK = self::PREFIX . '/check';
+    private const ENDPOINT_CHECK = self::PREFIX.'/check';
 
     /**
      * @const string
      */
-    private const ENDPOINT_GET_PERMISSIONS = '/auth' . '/permissions';
+    private const ENDPOINT_GET_PERMISSIONS = '/auth'.'/permissions';
 
-    /**
-     * @var Hub
-     */
     private Hub $hub;
 
     /**
      * AuthResource constructor.
-     *
-     * @param Hub $hub
      */
     public function __construct(Hub $hub)
     {
@@ -47,9 +40,7 @@ class AuthResource extends Resource implements AuthResourceContract
     /**
      * Checks if the token passed by parameter or previously loaded in the ISS Service is valid.
      *
-     * @param string $token
      *
-     * @return bool
      *
      * @throws RequestException
      */
@@ -65,7 +56,6 @@ class AuthResource extends Resource implements AuthResourceContract
     /**
      * It is possible to obtain ALL the permissions of the token uploaded to the ISS Service.
      *
-     * @return Response
      *
      * @throws RequestException
      */

@@ -17,7 +17,7 @@ return [
 
     'programatic_access' => [
         'client_id' => env('HUB_PROGRAMMATIC_CLIENT'),
-        'client_secret' => env('HUB_PROGRAMMATIC_SECRET')
+        'client_secret' => env('HUB_PROGRAMMATIC_SECRET'),
     ],
 
     'oauth' => [
@@ -28,11 +28,11 @@ return [
 
         'authorize_uri' => '/auth/authorize',
         'token_uri' => '/oauth/token',
-        'userinfo_uri' => '/users/me'
+        'userinfo_uri' => '/users/me',
     ],
 
     'redirects' => [
-        'userinfo_edit' => '/me'
-    ]
+        'userinfo_edit' => '/me',
+    ],
 
 ];
