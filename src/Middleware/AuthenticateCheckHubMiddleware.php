@@ -39,6 +39,8 @@ class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
 
             $this->loginByUserId($user->id);
         } catch (Exception $e) {
+            Cache::delete($md5Token);
+
             Log::error($e->getMessage());
             return response()->json([
                 'status' => [
