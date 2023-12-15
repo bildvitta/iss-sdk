@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use BildVitta\Hub\Traits\LoginUser;
 
 class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
@@ -39,7 +38,9 @@ class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
 
             $this->loginByUserId($user->id);
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            Cache::delete($md5Token);
+
+            report($e);
             return response()->json([
                 'status' => [
                     'code' => Response::HTTP_UNAUTHORIZED,
