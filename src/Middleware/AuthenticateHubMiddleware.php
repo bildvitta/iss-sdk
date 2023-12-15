@@ -46,7 +46,7 @@ class AuthenticateHubMiddleware extends AuthenticateHubHelpers
 
             $this->loginUserByCache($cacheHash, $cacheKey, $token);
         } catch (Exception $e) {
-            $md5Token = md5($token) . '-check';
+            $md5Token = md5($token).'-check';
 
             Cache::delete($md5Token);
 
