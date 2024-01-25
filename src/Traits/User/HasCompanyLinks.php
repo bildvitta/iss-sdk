@@ -82,7 +82,10 @@ trait HasCompanyLinks
 
     public function getMainLinkedCompanies(): array
     {
-        return $this->company_links()->whereNull('main_company_id')->get(['companies.id'])->pluck(['id'])->toArray();
+        $hubCompanyModel = app(config('hub.model_company'));
+        $tableName = $hubCompanyModel->getTable();
+
+        return $this->company_links()->whereNull('main_company_id')->get(["$tableName.id"])->pluck(['id'])->toArray();
     }
 
     public function hasMainLinkedCompanies(): bool
