@@ -29,6 +29,7 @@ return [
         'authorize_uri' => '/auth/authorize',
         'token_uri' => '/oauth/token',
         'userinfo_uri' => '/users/me',
+        'notifications_uri' => '/users/me/notifications',
     ],
 
     'redirects' => [
