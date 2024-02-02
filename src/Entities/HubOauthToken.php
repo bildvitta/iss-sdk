@@ -12,7 +12,7 @@ class HubOauthToken extends Model
         'access_token',
         'refresh_token',
         'expires_in',
-        'expires_in_dt'
+        'expires_in_dt',
     ];
 
     public function __construct(array $attributes = [])
@@ -22,8 +22,6 @@ class HubOauthToken extends Model
 
     /**
      * Check if the token is about to expire or is expired
-     *
-     * @return bool
      */
     public function is_expired(): bool
     {
@@ -31,6 +29,7 @@ class HubOauthToken extends Model
         if ($diffDates->days <= 1) {
             return true;
         }
+
         return false;
     }
 }

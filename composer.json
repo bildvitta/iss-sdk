@@ -18,18 +18,18 @@
     }
   ],
   "require": {
-    "php": "^7.4|^8.0|^8.1",
-    "illuminate/cache": "^7.0|^8.49|^9.0",
-    "illuminate/config": "^7.0|^8.50|^9.0",
-    "illuminate/contracts": "^7.0|^8.0|^9.0",
-    "illuminate/log": "^7.0|^8.65|^9.0",
-    "illuminate/routing": "^7.0|^8.49|^9.0",
-    "illuminate/support": "^7.0|^8.0|^9.0",
-    "illuminate/view": "^7.0|^8.49|^9.0",
-    "spatie/laravel-permission": "^4.0|^5.0"
+    "php": "^7.4|^8.0|^8.1|^8.2|^8.3",
+    "illuminate/cache": "^7.0|^8.49|^9.0|^10.0",
+    "illuminate/config": "^7.0|^8.50|^9.0|^10.0",
+    "illuminate/contracts": "^7.0|^8.0|^9.0|^10.0",
+    "illuminate/log": "^7.0|^8.65|^9.0|^10.0",
+    "illuminate/routing": "^7.0|^8.49|^9.0|^10.0",
+    "illuminate/support": "^7.0|^8.0|^9.0|^10.0",
+    "illuminate/view": "^7.0|^8.49|^9.0|^10.0",
+    "spatie/laravel-permission": "^4.0|^5.0|^6.0"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.0",
+    "laravel/pint": "^1.13",
     "phpunit/phpunit": "^10.0"
   },
   "autoload": {
@@ -59,10 +59,10 @@
   "minimum-stability": "dev",
   "scripts": {
     "check-style": [
-      "vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php --diff --verbose --dry-run"
+      "vendor/bin/pint --test"
     ],
     "fix-style": [
-      "vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php"
+      "vendor/bin/pint"
     ]
   }
 }

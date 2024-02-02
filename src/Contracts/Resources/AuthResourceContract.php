@@ -7,17 +7,13 @@ use Illuminate\Http\Client\Response;
 
 /**
  * Interface AuthResourceContract.
- *
- * @package BildVitta\Hub\Contracts\Resources
  */
 interface AuthResourceContract
 {
     /**
      * Checks if the token passed by parameter or previously loaded in the ISS Service is valid.
      *
-     * @param  string  $token
      *
-     * @return bool
      *
      * @throws RequestException
      */
@@ -26,7 +22,6 @@ interface AuthResourceContract
     /**
      * It is possible to obtain ALL the permissions of the token uploaded to the ISS Service.
      *
-     * @return Response
      *
      * @throws RequestException
      */

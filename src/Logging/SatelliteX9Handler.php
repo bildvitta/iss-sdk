@@ -12,8 +12,7 @@ class SatelliteX9Handler extends AbstractProcessingHandler
     protected array $config = [];
 
     /**
-     * @param int $level
-     * @param array $config
+     * @param  int  $level
      */
     public function __construct($level = Logger::DEBUG, array $config = [])
     {
@@ -23,6 +22,7 @@ class SatelliteX9Handler extends AbstractProcessingHandler
 
     /**
      * {@inheritdoc}
+     *
      * @throws Exception
      */
     public function handleBatch(array $records): void
@@ -32,9 +32,6 @@ class SatelliteX9Handler extends AbstractProcessingHandler
         }
     }
 
-    /**
-     * @param array $record
-     */
     protected function write(array $record): void
     {
         $with_config = $this->config['with'];
@@ -46,11 +43,11 @@ class SatelliteX9Handler extends AbstractProcessingHandler
             'entity' => $record['context']['entity'] ?? null,
             'entity_uuid' => $record['context']['entity_uuid'] ?? null,
             'module' => $with_config['app_module'],
-            'request' => $record['level_name']
+            'request' => $record['level_name'],
         ];
 
         try {
-            $url = $with_config['app_url'] . $with_config['app_endpoint'];
+            $url = $with_config['app_url'].$with_config['app_endpoint'];
             $response = Http::post($url, $data);
         } catch (Exception $e) {
             throw $e;

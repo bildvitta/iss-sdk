@@ -2,12 +2,7 @@
 
 namespace BildVitta\Hub\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-/**
- * Class LoginRequest
- */
-class LoginRequest extends FormRequest
+class NotificationRequest extends FormRequests
 {
     /**
      * Determine if the user is authorized to make this request.

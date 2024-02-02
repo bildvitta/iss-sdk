@@ -7,10 +7,6 @@ use Monolog\Logger;
 
 class SatelliteX9Logger
 {
-    /**
-     * @param array $config
-     * @return Logger
-     */
     public function __invoke(array $config): Logger
     {
         $logger = new Logger('satelliteX9');
@@ -19,6 +15,7 @@ class SatelliteX9Logger
 
         $x9_handler->pushProcessor(function ($record) {
             $record['user_uuid'] = Auth::user() ? Auth::user()->uuid : null;
+
             return $record;
         });
 

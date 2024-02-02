@@ -14,19 +14,15 @@ use Illuminate\Support\ServiceProvider;
 
 /**
  * Class HubServiceProvider.
- *
- * @package BildVitta\Hub
  */
 class HubServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/hub.php', 'hub');
+        $this->mergeConfigFrom(__DIR__.'/../config/hub.php', 'hub');
 
         $this->app->singleton('hub', fn ($app, $args) => new Hub($args[0] ?? request()->bearerToken()));
     }
@@ -34,7 +30,6 @@ class HubServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      *
-     * @return void
      *
      * @throws BindingResolutionException
      */
@@ -42,13 +37,13 @@ class HubServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes(
-                [__DIR__ . '/../config/hub.php' => config_path('hub.php')],
+                [__DIR__.'/../config/hub.php' => config_path('hub.php')],
                 'hub-config'
             );
         }
 
-        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->commands([InstallHub::class]);
 
         $router = $this->app->make(Router::class);

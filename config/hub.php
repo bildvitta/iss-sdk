@@ -8,7 +8,7 @@ return [
     'prefix' => env('MS_HUB_API_PREFIX', '/api'),
 
     'model_user' => \App\Models\User::class,
-
+    'model_user_key' => 'uuid',
     'model_company' => \BildVitta\Hub\Entities\HubCompany::class,
     'model_position' => \BildVitta\Hub\Entities\HubPosition::class,
     'model_user_company' => \BildVitta\Hub\Entities\HubUserCompany::class,
@@ -17,7 +17,7 @@ return [
 
     'programatic_access' => [
         'client_id' => env('HUB_PROGRAMMATIC_CLIENT'),
-        'client_secret' => env('HUB_PROGRAMMATIC_SECRET')
+        'client_secret' => env('HUB_PROGRAMMATIC_SECRET'),
     ],
 
     'oauth' => [
@@ -28,11 +28,12 @@ return [
 
         'authorize_uri' => '/auth/authorize',
         'token_uri' => '/oauth/token',
-        'userinfo_uri' => '/users/me'
+        'userinfo_uri' => '/users/me',
+        'notifications_uri' => '/users/me/notifications',
     ],
 
     'redirects' => [
-        'userinfo_edit' => '/me'
-    ]
+        'userinfo_edit' => '/me',
+    ],
 
 ];

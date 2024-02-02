@@ -1,6 +1,5 @@
 <?php
 
-
 namespace BildVitta\Hub\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -11,7 +10,6 @@ use Illuminate\Routing\Controller as BaseController;
 
 /**
  * Class Controller
- * @package BildVitta\Hub\Http\Controllers
  */
 class Controller extends BaseController
 {
@@ -19,9 +17,6 @@ class Controller extends BaseController
     use DispatchesJobs;
     use ValidatesRequests;
 
-    /**
-     * @var JsonResponse
-     */
     protected JsonResponse $jsonResponse;
 
     /**

@@ -9,8 +9,6 @@ use RuntimeException;
 
 /**
  * Class HubApi.
- *
- * @package BildVitta\Hub\Facades
  */
 class Hub extends Facade
 {
@@ -22,7 +20,6 @@ class Hub extends Facade
     /**
      * Get the registered name of the component.
      *
-     * @return string
      *
      * @throws RuntimeException
      */
