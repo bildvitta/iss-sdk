@@ -25,6 +25,6 @@ Route::prefix('api/users/')->middleware('hub.auth')->group(function () {
     Route::patch('me')->name('hub.users.me.patch')->uses(MePatchController::class);
     Route::get('me/edit')->name('hub.users.edit')->uses(MeEditController::class);
 
-    Route::get('/notifications')->name('users.me.notifications.index')->uses(Notifications\IndexController::class);
-    Route::patch('/notifications')->name('users.me.notifications.patch')->uses(Notifications\PatchController::class);
+    Route::get('me/notifications')->name('users.me.notifications.index')->uses(Notifications\IndexController::class);
+    Route::patch('me/notifications')->name('users.me.notifications.patch')->uses(Notifications\PatchController::class);
 });
