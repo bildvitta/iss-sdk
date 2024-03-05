@@ -11,7 +11,7 @@ class NotificationResource extends Resource
     /**
      * @const string
      */
-    private const PREFIX = '/notifications';
+    private const PREFIX = 'programmatic/notifications';
 
     private Hub $hub;
 
