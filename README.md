@@ -65,6 +65,23 @@ MS_HUB_BASE_URI="https://api-dev-hub.nave.dev"
 MS_HUB_PREFIX="/api"
 ```
 
+## Change permission and role model from spatie/laravel-permissions
+
+You should change the default spatie/laravel-permissions models to ours, as we have some substantial changes to the use of Role and Permission.
+
+```php
+// config/permission.php
+
+return [
+    'models' = [
+        'permission' => \BildVitta\Hub\Entities\HubPermission::class,
+        'role' => \BildVitta\Hub\Entities\HubRole::class,
+    ]
+];
+```
+
+If you already have a change to these models, just extend our classes to have the correct functionalities.
+
 ## Add Trait on User Model
 
 And remember to add the `BildVitta\Hub\Traits\User\HasCompanyLinks` Trait in the Users model.
@@ -199,48 +216,6 @@ return (new RealEstateDevelopmentResource('index', $query->get()))->count($count
 ```
 
 Remembering that the scope name has to be permission, if not, it doesn't work <3
-
-## Logging
-
-To generate the log, just put the settings in the `config/logging.php` file
-
-```php
-[
-    
-
-    'channels' => [
-        'stack' => [
-            'driver' => 'stack',
-            'channels' => ['single', 'stderr', 'satelliteX9'], # Add satelliteX9 on channels
-            'ignore_exceptions' => false,
-        ],
-        
-        ...
-        
-        'satelliteX9' => [
-            'driver' => 'custom',
-            'via' => BildVitta\Hub\Logging\SatelliteX9Logger::class,
-            'with' => [
-                'app_url' => env('SATELLITE_X9_URL', ''),
-                'app_endpoint' => env('SATELLITE_X9_ENDPOINT', ''),
-                'app_module' => env('SATELLITE_X9_MODULE', '')
-            ]
-        ]
-    ]
-]
-```
-
-After the configuration, just use the normal Laravel Log. Passing the entity, entity uuid and action attributes as arguments.
-
-```php
-use Log;
-
-Log::info(__('Created user'), [
-    'entity' => 'user',
-    'entity_uuid' => $user->uuid,
-    'action' => 'store'
-]);
-```
 
 ## Testing
 
