@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 trait HasCompanyLinks
@@ -61,11 +63,6 @@ trait HasCompanyLinks
         return $this->company();
     }
 
-    public function getAllPermissions(): Collection
-    {
-        return $this->user_company?->getAllPermissions() ?? collect([]);
-    }
-
     public function realEstateDevelopments(): Attribute
     {
         return Attribute::get(function () {
@@ -91,5 +88,29 @@ trait HasCompanyLinks
     public function hasMainLinkedCompanies(): bool
     {
         return $this->company_links()->whereNull('main_company_id')->exists();
+    }
+
+    // Overwrite Spatie\Permission\Traits\HasRoles
+    public function getAllPermissions(): Collection
+    {
+        return $this->user_company?->getAllPermissions() ?? collect([]);
+    }
+
+    public function getRoleNames(): Collection
+    {
+        $this->loadMissing('user_company');
+
+        return $this->user_company?->roles->pluck('name') ?? collect([]);
+    }
+
+    public function getPermissionsViaRoles(): Collection
+    {
+        if (is_a($this, Role::class) || is_a($this, Permission::class)) {
+            return collect();
+        }
+
+        return $this->loadMissing('user_company', 'user_company.roles')
+            ->user_company?->roles->flatMap(fn ($role) => $role->permissions)
+            ->sort()->values() ?? collect([]);
     }
 }
