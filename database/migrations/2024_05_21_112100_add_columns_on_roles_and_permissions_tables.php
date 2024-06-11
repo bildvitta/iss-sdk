@@ -38,6 +38,7 @@ return new class extends Migration
             $table->dropColumn('uuid');
             $table->dropColumn('description');
             $table->dropForeign(['hub_company_id']);
+            $table->dropColumn('hub_company_id');
             $table->dropColumn('has_all_real_estate_developments');
             $table->dropColumn('is_post_construction');
         });
