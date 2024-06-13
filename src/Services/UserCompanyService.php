@@ -32,7 +32,7 @@ class UserCompanyService
      * @param  string  $parentUserUuid
      * @param  string  $companyUuid
      * @param  bool  $allBelow
-     * @param  int  $onlyPositionOrder null|0|1|2
+     * @param  int  $onlyPositionOrder  null|0|1|2
      * @param  array  $attributes
      * @return User
      */
@@ -235,7 +235,7 @@ class UserCompanyService
      * Get users by companyUuid and positionUuid
      *
      * @param  string  $companyUuid
-     * @param  int  $positionOrder 0|1|2
+     * @param  int  $positionOrder  0|1|2
      * @param  array  $filter
      * @param  array  $attributes
      * @return User
@@ -350,7 +350,7 @@ class UserCompanyService
      *
      * @param  string  $companyUuid
      * @param  string  $userUuid
-     * @param  int  $positionOrder 0|1|2
+     * @param  int  $positionOrder  0|1|2
      * @return bool
      */
     public static function checkPositionUser($companyUuid, $userUuid, $positionOrder)
@@ -393,7 +393,7 @@ class UserCompanyService
      *
      * @param  string  $userUuid
      * @param  string  $companyUuid
-     * @param  int  $onlyPositionOrder null|0|1
+     * @param  int  $onlyPositionOrder  null|0|1
      * @param  array  $attributes
      * @return User
      */
