@@ -10,8 +10,7 @@ class PublicListScope implements Scope
 {
     public function __construct(
         protected bool $public_list
-    ) {
-    }
+    ) {}
 
     public function apply(Builder $builder, Model $model)
     {

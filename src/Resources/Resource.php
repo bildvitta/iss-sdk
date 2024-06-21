@@ -2,6 +2,4 @@
 
 namespace BildVitta\Hub\Resources;
 
-class Resource
-{
-}
+class Resource {}

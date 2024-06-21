@@ -8,6 +8,4 @@ use Throwable;
 /**
  * Class HubException.
  */
-class HubException extends Exception implements Throwable
-{
-}
+class HubException extends Exception implements Throwable {}
