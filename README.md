@@ -231,7 +231,7 @@ Then, set the BROADCAST_CONNECTION environment variable to ably in your applicat
 BROADCAST_CONNECTION=ably
 ```
 
-Finally, check the `routes/channels.php` file if the private channel authentication route is correct.
+Check the `routes/channels.php` file if the private channel authentication route is correct.
 
 ```php
 use Illuminate\Support\Facades\Broadcast;
@@ -239,6 +239,15 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('notifications.{uuid}', function ($user, $uuid) {
     return (string) $user->uuid === (string) $uuid;
 });
+```
+
+To finish, go to the BroadcastServiceProvider file and change it to this code.
+
+```php
+Broadcast::routes([
+    'middleware' => ['hub.check'],
+    'prefix' => 'api',
+]);
 ```
 
 Ensure that the $user->uuid is the same as that used in the hub, otherwise it may result in a 403 in this private channel authentication api.
