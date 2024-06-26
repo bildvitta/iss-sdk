@@ -241,6 +241,8 @@ Broadcast::channel('notifications.{uuid}', function ($user, $uuid) {
 });
 ```
 
+Ensure that the $user->uuid is the same as that used in the hub, otherwise it may result in a 403 in this private channel authentication api.
+
 To finish, go to the BroadcastServiceProvider file and change it to this code.
 
 ```php
@@ -249,8 +251,6 @@ Broadcast::routes([
     'prefix' => 'api',
 ]);
 ```
-
-Ensure that the $user->uuid is the same as that used in the hub, otherwise it may result in a 403 in this private channel authentication api.
 
 ## Testing
 
