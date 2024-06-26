@@ -219,6 +219,8 @@ Remembering that the scope name has to be permission, if not, it doesn't work <3
 
 ### Notifications
 
+> Make sure the BroadcastServiceProvider is enabled in `config/app.php`
+
 Add the `ABLY_KEY` key as an environment variable (ask your coordinator for this key)
 
 ```env
