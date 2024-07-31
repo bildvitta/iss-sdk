@@ -14,6 +14,7 @@ return [
     'model_user_company' => \BildVitta\Hub\Entities\HubUserCompany::class,
     'model_user_company_parent_position' => \BildVitta\Hub\Entities\HubUserCompanyParentPosition::class,
     'model_user_company_real_estate_development' => \BildVitta\Hub\Entities\HubUserCompanyRealEstateDevelopment::class,
+    'model_brand' => \BildVitta\Hub\Entities\HubBrand::class,
 
     'programatic_access' => [
         'client_id' => env('HUB_PROGRAMMATIC_CLIENT'),
