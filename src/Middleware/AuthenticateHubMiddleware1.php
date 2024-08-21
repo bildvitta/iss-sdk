@@ -50,7 +50,7 @@ class AuthenticateHubMiddleware1
         $this->authService = app('auth');
         $this->configService = app('config');
         $this->cacheService = app('cache');
-        $this->hubUserModel = new HubUser();
+        $this->hubUserModel = new HubUser;
     }
 
     /**
@@ -216,7 +216,7 @@ class AuthenticateHubMiddleware1
 
             $user->hub_uuid = $apiUser->uuid;
         } catch (ModelNotFoundException $modelNotFoundException) {
-            $user = new $userModel();
+            $user = new $userModel;
             $user->hub_uuid = $apiUser->uuid;
             $user->name = $apiUser->name;
             $user->email = $apiUser->email;
@@ -228,7 +228,7 @@ class AuthenticateHubMiddleware1
             $company = $companyModel::where('uuid', '=', $apiUser->company)->firstOrFail();
             $company->name = $hubCompany->name;
         } catch (ModelNotFoundException $modelNotFoundException) {
-            $company = new $companyModel();
+            $company = new $companyModel;
             $company->uuid = $hubCompany->uuid;
             $company->name = $hubCompany->name;
         }

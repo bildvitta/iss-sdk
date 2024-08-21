@@ -20,4 +20,19 @@ class HubCompany extends Model
     {
         return $this->belongsTo(HubCompany::class, 'main_company_id', 'id');
     }
+
+    public function companies()
+    {
+        return $this->hasMany(HubCompany::class, 'main_company_id', 'id');
+    }
+
+    public function positions()
+    {
+        return $this->hasMany(HubPosition::class, 'company_id', 'id');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(HubBrand::class, 'brand_id', 'id');
+    }
 }

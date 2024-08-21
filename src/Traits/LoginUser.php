@@ -170,7 +170,7 @@ trait LoginUser
                 $company = $companyModel::where('uuid', '=', $apiUser->company)->firstOrFail();
                 $company->name = $hubCompany->name;
             } catch (ModelNotFoundException $modelNotFoundException) {
-                $company = new $companyModel();
+                $company = new $companyModel;
                 $company->uuid = $hubCompany->uuid;
                 $company->name = $hubCompany->name;
             }
