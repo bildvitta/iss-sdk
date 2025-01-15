@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'base_uri' => env('MS_HUB_BASE_URI', 'https://api-dev-hub.nave.dev'),
+    'base_uri' => env('MS_HUB_BASE_URI', 'https://hub-server.nave.dev.br'),
 
-    'front_uri' => env('MS_HUB_FRONT_URI', 'https://develop.hub.nave.dev'),
+    'front_uri' => env('MS_HUB_FRONT_URI', 'https://hub.nave.dev.br'),
 
     'prefix' => env('MS_HUB_API_PREFIX', '/api'),
 
@@ -35,6 +35,14 @@ return [
 
     'redirects' => [
         'userinfo_edit' => '/me',
+    ],
+
+    'db' => [
+        'host' => env('MS_HUB_DB_HOST'),
+        'port' => env('MS_HUB_DB_PORT'),
+        'database' => env('MS_HUB_DB_DATABASE'),
+        'username' => env('MS_HUB_DB_USERNAME'),
+        'password' => env('MS_HUB_DB_PASSWORD'),
     ],
 
 ];
