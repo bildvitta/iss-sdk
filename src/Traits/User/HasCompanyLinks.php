@@ -113,4 +113,43 @@ trait HasCompanyLinks
             ->user_company?->roles->flatMap(fn ($role) => $role->permissions)
             ->sort()->values() ?? collect([]);
     }
+
+    public function company_link_logged()
+    {
+        return $this->hasOne(UserCompany::class, 'user_id', 'id')
+            ->where('company_id', auth()->user()->company_id);
+    }
+
+    public function companyPermissions(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->user_companies->mapWithKeys(function ($userCompany) {
+                return [
+                    $userCompany->company->uuid => $userCompany->getAllPermissions()
+                        ->pluck('name'),
+                ];
+            });
+        })->shouldCache();
+    }
+
+    public function checkCompanyPermission(string $ability, ?Model $model): bool
+    {
+        // Caso model for nulo deve olhar para qualquer permissão
+        if (is_null($model)) {
+            return collect($this->company_permissions)
+                ->flatten()
+                ->unique()
+                ->contains($ability);
+        }
+
+        $company = $model->uuid;
+        $main_company = $model->main_company?->uuid;
+
+        $companyPermissions = $this->company_permissions[$company] ?? [];
+        $mainCompanyPermissions = $this->company_permissions[$main_company] ?? [];
+
+        return collect($companyPermissions)->merge($mainCompanyPermissions)
+            ->unique()
+            ->contains($ability);
+    }
 }

@@ -38,15 +38,10 @@ class Hub extends Factory
 
     public PendingRequest $request;
 
-    /**
-     * @var ?string
-     */
     private ?string $token;
 
     /**
      * Hub constructor.
-     *
-     * @param  ?string  $token
      */
     public function __construct(?string $token = null)
     {
