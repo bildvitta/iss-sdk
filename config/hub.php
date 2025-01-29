@@ -16,6 +16,8 @@ return [
     'model_user_company_real_estate_development' => \BildVitta\Hub\Entities\HubUserCompanyRealEstateDevelopment::class,
     'model_brand' => \BildVitta\Hub\Entities\HubBrand::class,
 
+    'api_version' => env('MS_HUB_API_VERSION', '1'),
+
     'programatic_access' => [
         'client_id' => env('HUB_PROGRAMMATIC_CLIENT'),
         'client_secret' => env('HUB_PROGRAMMATIC_SECRET'),
