@@ -9,6 +9,7 @@ use BildVitta\Hub\Console\InstallHub;
 use BildVitta\Hub\Middleware\AuthenticateCheckHubMiddleware;
 use BildVitta\Hub\Middleware\AuthenticateHubMiddleware;
 use BildVitta\Hub\Middleware\ProgrammaticMiddleware;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
