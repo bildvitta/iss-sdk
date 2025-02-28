@@ -265,6 +265,40 @@ Broadcast::routes([
 ]);
 ```
 
+## New Per-Company Permissioning (v2)
+
+To use the new permissioning method, you must follow these steps and make the necessary changes for the reality of each project.
+
+First, in the `config/permissions.php` file you must change the `register_permission_check_method` attribute from true to false, as we will control the permissioning method manually.
+
+Example:
+```php
+// config/permission.php
+return [
+    ...
+    'register_permission_check_method' => false
+    ...
+];
+```
+
+After leaving it as false, in requests or policies the following change must be made (if applicable) to the `->can` method that exists within the user (or the model that extends `HasRoles` or `HasPermissions`)
+
+If the permission for the screen in question needs to be per company, you must pass the company's `uuid` as the second parameter of the `can()` method. Example:
+
+```php
+$user->can('users.show', 'company-uuid');
+```
+
+The code above will check if the 'users.show' permission exists within the company passed as a parameter. If it does, it returns true, otherwise false.
+
+If you have screens that do not require permission per company, but cases where, if the person has permission regardless of the link, just leave the `can()` method as it is, for example:
+
+```php
+$user->can('users.show');
+```
+
+In the code above, it will search for this permission in any of the user's existing links, if found it returns true otherwise false.
+
 ## Testing
 
 coming soon...
