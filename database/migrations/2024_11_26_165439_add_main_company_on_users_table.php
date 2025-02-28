@@ -14,9 +14,9 @@ return new class extends Migration
         $userModel = app(config('hub.model_user'));
         $companyModel = app(config('hub.model_company'));
 
-        Schema::table($userModel->getTable(), function (Blueprint $table) use ($userModel) {
+        Schema::table($userModel->getTable(), function (Blueprint $table) use ($userModel, $companyModel) {
             if (! Schema::hasColumn($userModel->getTable(), 'main_company_id')) {
-                $table->after('company_id', function ($table) {
+                $table->after('company_id', function ($table) use ($companyModel) {
                     $table->foreignId('main_company_id')
                         ->nullable()
                         ->constrained($companyModel->getTable())
