@@ -120,6 +120,14 @@ trait HasCompanyLinks
             ->where('company_id', auth()->user()->company_id);
     }
 
+    public function user_public_companies(): HasMany
+    {
+        $companyModel = app(config('hub.model_company'));
+
+        return $this->hasMany($companyModel, 'main_company_id', 'company_id')
+            ->where('public_list', 1);
+    }
+
     public function companyPermissions(): Attribute
     {
         return Attribute::get(function () {
