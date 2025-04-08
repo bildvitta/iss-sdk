@@ -16,6 +16,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Arr;
 
 /**
  * Class HubServiceProvider.
