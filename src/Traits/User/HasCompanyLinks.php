@@ -141,23 +141,21 @@ trait HasCompanyLinks
         })->shouldCache();
     }
 
-    public function checkCompanyPermission(string $ability, ?Model $model): bool
+    public function checkCompanyPermission(string $ability, array $models): bool
     {
         // Caso model for nulo deve olhar para qualquer permissão
-        if (is_null($model)) {
+        if (empty($models)) {
             return collect($this->company_permissions)
                 ->flatten()
                 ->unique()
                 ->contains($ability);
         }
 
-        $company = $model->uuid;
-        $main_company = $model->main_company?->uuid;
-
-        $companyPermissions = $this->company_permissions[$company] ?? [];
-        $mainCompanyPermissions = $this->company_permissions[$main_company] ?? [];
-
-        return collect($companyPermissions)->merge($mainCompanyPermissions)
+        // Caso model for vazio deve olhar para qualquer permissão dentro dos models passados
+        return collect($this->company_permissions)->filter(function ($permissions, $key) use ($models) {
+            return in_array($key, $models);
+        })
+            ->flatten(1)
             ->unique()
             ->contains($ability);
     }
