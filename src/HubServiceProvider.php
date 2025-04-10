@@ -9,14 +9,15 @@ use BildVitta\Hub\Console\InstallHub;
 use BildVitta\Hub\Middleware\AuthenticateCheckHubMiddleware;
 use BildVitta\Hub\Middleware\AuthenticateHubMiddleware;
 use BildVitta\Hub\Middleware\ProgrammaticMiddleware;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * Class HubServiceProvider.
@@ -66,14 +67,32 @@ class HubServiceProvider extends ServiceProvider
                 }
 
                 if (request()->checkVersion('2')) {
-                    $model = Arr::first($args, fn ($arg) => is_string($arg));
+                    $models = collect($args)
+                        ->filter(function ($value) use ($args) {
+                            if (is_null($value)) {
+                                Log::error('Argumento nulo', [
+                                    'args' => $args,
+                                    'route' => request()->route(),
+                                    'user' => auth()->user()?->email,
+                                ]);
 
-                    if (is_string($model)) {
-                        $companyModel = config('hub.model_company');
-                        $model = app($companyModel)->with('main_company')->where('uuid', $model)->firstOrFail();
-                    }
+                                return false;
+                            }
 
-                    return $user->checkCompanyPermission($ability, $model);
+                            if (! Str::isUuid($value)) {
+                                Log::error('Argumento não é uuid', [
+                                    'args' => $args,
+                                    'route' => request()->route(),
+                                    'user' => auth()->user()?->email,
+                                ]);
+
+                                return false;
+                            }
+
+                            return is_string($value);
+                        })->toArray();
+
+                    return $user->checkCompanyPermission($ability, $models);
                 }
 
                 if (method_exists($user, 'checkPermissionTo')) {
