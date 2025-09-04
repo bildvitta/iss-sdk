@@ -66,6 +66,8 @@ class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
 
         return Http::withHeaders([
             'Accept' => 'application/json',
-        ])->get($url);
+        ])
+            ->withToken($token)
+            ->get($url);
     }
 }
