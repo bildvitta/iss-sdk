@@ -14,13 +14,13 @@ Route::prefix('api/auth')->middleware(['throttle'])->group(function () {
     Route::get('login')->name('hub.auth.login')->uses(LoginController::class);
     Route::get('callback')->name('hub.auth.callback')->uses(CallbackController::class);
 
-    Route::middleware('hub.auth')->group(function () {
+    Route::middleware('hub.check')->group(function () {
         Route::get('logout')->name('hub.auth.logout')->uses(LogoutController::class);
         Route::get('refresh')->name('hub.auth.refresh')->uses(RefreshController::class);
     });
 });
 
-Route::prefix('api/users/')->middleware('hub.auth')->group(function () {
+Route::prefix('api/users/')->middleware('hub.check')->group(function () {
     Route::get('me')->name('hub.users.me')->uses(MeController::class);
     Route::patch('me')->name('hub.users.me.patch')->uses(MePatchController::class);
     Route::get('me/edit')->name('hub.users.edit')->uses(MeEditController::class);
