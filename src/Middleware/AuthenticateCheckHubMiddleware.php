@@ -44,7 +44,7 @@ class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
         return Cache::remember($md5Token, 60 * 60, function () use ($token) {
             $response = $this->checkCredentials($token);
             if ($response->status() !== Response::HTTP_OK) {
-                throw new \Exception(__('Unable to authenticate bearerToken.'));
+                $this->throw(__('Unable to authenticate bearerToken.'));
             }
             return json_decode($response->body());
         });
