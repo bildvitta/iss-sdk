@@ -2,6 +2,7 @@
 
 namespace BildVitta\Hub\Middleware;
 
+use BildVitta\Hub\Exceptions\AuthenticationException;
 use BildVitta\Hub\Middleware\Helpers\AuthenticateHubHelpers;
 use BildVitta\Hub\Traits\LoginUser;
 use Carbon\Carbon;
@@ -44,7 +45,7 @@ class AuthenticateCheckHubMiddleware extends AuthenticateHubHelpers
         return Cache::remember($md5Token, 60 * 60, function () use ($token) {
             $response = $this->checkCredentials($token);
             if ($response->status() !== Response::HTTP_OK) {
-                throw new \Exception(__('Unable to authenticate bearerToken.'));
+                throw new AuthenticationException(__('Unable to authenticate bearerToken.'));
             }
             return json_decode($response->body());
         });
