@@ -4,6 +4,7 @@ namespace BildVitta\Hub\Models;
 
 use BildVitta\Hub\Traits\UsesHubDB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Ramsey\Uuid\Uuid;
@@ -34,6 +35,11 @@ class Brand extends Model
     }
 
     //
+
+    public function main_company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'main_company_id');
+    }
 
     public function companies(): HasMany
     {
