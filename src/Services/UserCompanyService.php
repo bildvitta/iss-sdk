@@ -240,8 +240,13 @@ class UserCompanyService
      * @param  array  $attributes
      * @return User
      */
-    public static function getUsersByCompanyUuidAndPositionOrder($companyUuid, $positionOrder, $filter = ['is_active' => 1], $attributes = ['uuid', 'name', 'is_active'])
-    {
+    public static function getUsersByCompanyUuidAndPositionOrder(
+        $companyUuid,
+        $positionOrder,
+        $filter = ['is_active' => 1],
+        $attributes = ['uuid', 'name', 'is_active'],
+        $withHubCompanyTrash = false
+    ) {
         $cacheKey = "UCS-UsersByCompanyUuidAndPositionOrder-{$companyUuid}-{$positionOrder}-filter-".implode('-', $filter).'-attributes-'.implode('-', $attributes);
 
         if (Cache::tags(['UserCompanyService', "Company-$companyUuid"])->has($cacheKey)) {
@@ -275,6 +280,9 @@ class UserCompanyService
         $users = $userModel::join($tableUserCompany, "{$tableUserCompany}.user_id", "{$tableUser}.id")
             ->where("{$tableUserCompany}.company_id", $company->id)
             ->where("{$tableUserCompany}.position_id", $position['id'])
+            ->when(! $withHubCompanyTrash, function ($query) use ($tableUserCompany) {
+                $query->whereNull("{$tableUserCompany}.deleted_at");
+            })
             ->select($attributes->toArray())
             ->orderBy('name');
 
