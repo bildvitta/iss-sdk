@@ -1,5 +1,13 @@
 <?php
 
+use App\Models\User;
+use BildVitta\Hub\Entities\HubBrand;
+use BildVitta\Hub\Entities\HubCompany;
+use BildVitta\Hub\Entities\HubPosition;
+use BildVitta\Hub\Entities\HubUserCompany;
+use BildVitta\Hub\Entities\HubUserCompanyParentPosition;
+use BildVitta\Hub\Entities\HubUserCompanyRealEstateDevelopment;
+
 return [
     'base_uri' => env('MS_HUB_BASE_URI', 'https://hub-server.nave.dev.br'),
 
@@ -7,14 +15,14 @@ return [
 
     'prefix' => env('MS_HUB_API_PREFIX', '/api'),
 
-    'model_user' => \App\Models\User::class,
+    'model_user' => User::class,
     'model_user_key' => 'uuid',
-    'model_company' => \BildVitta\Hub\Entities\HubCompany::class,
-    'model_position' => \BildVitta\Hub\Entities\HubPosition::class,
-    'model_user_company' => \BildVitta\Hub\Entities\HubUserCompany::class,
-    'model_user_company_parent_position' => \BildVitta\Hub\Entities\HubUserCompanyParentPosition::class,
-    'model_user_company_real_estate_development' => \BildVitta\Hub\Entities\HubUserCompanyRealEstateDevelopment::class,
-    'model_brand' => \BildVitta\Hub\Entities\HubBrand::class,
+    'model_company' => HubCompany::class,
+    'model_position' => HubPosition::class,
+    'model_user_company' => HubUserCompany::class,
+    'model_user_company_parent_position' => HubUserCompanyParentPosition::class,
+    'model_user_company_real_estate_development' => HubUserCompanyRealEstateDevelopment::class,
+    'model_brand' => HubBrand::class,
 
     'api_version' => env('MS_HUB_API_VERSION', '1'),
 
