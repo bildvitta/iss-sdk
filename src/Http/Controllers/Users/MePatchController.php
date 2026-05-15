@@ -18,10 +18,11 @@ class MePatchController extends UsersController
         ])->patch(
             $token_uri,
             [
-                'companies' => $request->get('companies'),
+                'companies' => $request->input('companies'),
+                'current_main_company' => $request->input('current_main_company'),
             ]
         );
 
-        return new Response($response, $response->status());
+        return new Response($response->body(), $response->status());
     }
 }
