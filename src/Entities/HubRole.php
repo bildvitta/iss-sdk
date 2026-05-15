@@ -4,8 +4,9 @@ namespace BildVitta\Hub\Entities;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Permission\Models\Role;
 
-class HubRole extends \Spatie\Permission\Models\Role
+class HubRole extends Role
 {
     protected $fillable = [
         'uuid',

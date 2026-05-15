@@ -7,6 +7,7 @@ namespace BildVitta\Hub\Console;
 use BildVitta\Hub\HubServiceProvider;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Spatie\Permission\PermissionServiceProvider;
 
 /**
  * Class InstallHubPackage.
@@ -29,7 +30,7 @@ class InstallHub extends Command
      * @const array
      */
     private const VENDOR_PUBLISH_MIGRATION_PARAMS = [
-        '--provider' => \Spatie\Permission\PermissionServiceProvider::class,
+        '--provider' => PermissionServiceProvider::class,
     ];
 
     /**

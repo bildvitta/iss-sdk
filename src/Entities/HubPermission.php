@@ -2,7 +2,9 @@
 
 namespace BildVitta\Hub\Entities;
 
-class HubPermission extends \Spatie\Permission\Models\Permission
+use Spatie\Permission\Models\Permission;
+
+class HubPermission extends Permission
 {
     //
 }
