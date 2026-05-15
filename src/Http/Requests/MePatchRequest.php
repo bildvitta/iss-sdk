@@ -8,12 +8,14 @@ class MePatchRequest extends FormRequest
 {
     public function rules(): array
     {
+        $companyTable = app(config('hub.model_company'))->getTable();
+
         return [
             'companies' => [
-                'sometimes', 'uuid', 'exists:companies,uuid',
+                'sometimes', 'uuid', "exists:{$companyTable},uuid",
             ],
             'current_main_company' => [
-                'sometimes', 'uuid', 'exists:companies,uuid',
+                'sometimes', 'uuid', "exists:{$companyTable},uuid",
             ],
         ];
     }
